@@ -45,16 +45,19 @@ $scope.loginData={};
  $scope.login=function(){
    $scope.usernamenull="b";
    $scope.passwordnull="b";
+   $scope.themduoc=true;
    console.log($scope.loginData.username);
   if(!$scope.loginData.username){
    $scope.usernamenull="a";
-   $scope.message="Please enter your username and password."
+   $scope.message="Please enter your username and password.";
+   $scope.themduoc=false;
   }
    if(!$scope.loginData.password){
    $scope.passwordnull="a";
-   $scope.message="Please enter your username and password."
+   $scope.message="Please enter your username and password.";
+   $scope.themduoc=false;
   }
-    else{
+    else if($scope.themduoc==true){
   var _condigHeader = {
     headers: {
         'Authorization': 'Basic 23423432',
