@@ -98,13 +98,14 @@ $scope.loginData={};
 
 }
 $scope.create=function(){
-  $state.go("signup")
+  $state.go("signup", {}, { reload: true })
 }
 
  
 })
 .controller('SignupCtrl', function($scope, $ionicModal, $timeout,$state,$http) {
 $scope.data={};
+
 
  $scope.continue=function(){
     $scope.themduoc=true;
@@ -321,7 +322,7 @@ $scope.message=window.localStorage.getItem("message");
                     window.localStorage.removeItem("lastname");
                     window.localStorage.removeItem("password");
                     window.localStorage.removeItem("username");
-  $state.go("login");
+  $state.go("login",{}, { reload: true });
  }
 
 
