@@ -105,7 +105,6 @@ $scope.data={};
 
  $scope.continue=function(){
     $scope.themduoc=true;
-  
         $scope.firstnamenull="b";
         $scope.lastnamenull="b";
         $scope.emailnull="b";
