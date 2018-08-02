@@ -122,7 +122,12 @@ $scope.data={};
          if ($scope.data.email){ window.localStorage.setItem("email", $scope.data.email);}
     else{$scope.emailnull="a";$scope.themduoc=false;}
        
-         if ($scope.data.username){ window.localStorage.setItem("username", $scope.data.username);}
+         if ($scope.data.username){ window.localStorage.setItem("username", $scope.data.username);
+       if($scope.data.username.trim().split('').length<=6){
+      $scope.message="Oops! Username is too short.";
+      $scope.usernamenull="a"
+      $scope.themduoc=false;
+    }}
     else{$scope.usernamenull="a";$scope.themduoc=false;}
         
          if ($scope.data.password){ window.localStorage.setItem("password", $scope.data.password);
