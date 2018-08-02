@@ -1,0 +1,73 @@
+/* Empty. Add your own CSS if you like */
+.a::-webkit-input-placeholder {
+ 
+  color: #9932CC;
+  font-weight: bold;	
+  font-style: italic;
+
+
+  
+}
+input.a[type=text] {
+	background-image:url(../img/chamthan.png); 
+	background-repeat: no-repeat; 
+	background-size: 30px;
+	background-position: right;
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 1px solid #9932CC;
+
+}
+input.a[type=password] {
+	background-image:url(../img/chamthan.png); 
+	background-repeat: no-repeat; 
+	background-size: 30px;
+	background-position: right;
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 1px solid #9932CC;
+}
+input.a[type=email] {
+	background-image:url(../img/chamthan.png); 
+	background-repeat: no-repeat; 
+	background-size: 30px;
+	background-position: right;
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 1px solid #9932CC;
+}
+
+input.b[type=text] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 1px solid #808080;
+}
+input.b[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 1px solid #808080;
+} 
+input.b[type=email] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: none;
+    border-bottom: 1px solid #808080;
+} 
+
