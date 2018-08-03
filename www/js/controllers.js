@@ -40,7 +40,7 @@ angular.module('starter.controllers', ['ngCordova','ngCordova.plugins.device'])
     }, 1000);
   };*/
 })
-.controller('LoginCtrl', function($scope, $ionicModal, $timeout,$http,$state) {
+.controller('LoginCtrl', function($scope, $ionicModal,$ionicLoading, $timeout,$http,$state) {
 $scope.loginData={};
  $scope.login=function(){
    $scope.usernamenull="b";
@@ -58,6 +58,7 @@ $scope.loginData={};
    $scope.themduoc=false;
   }
     else if($scope.themduoc==true){
+      $ionicLoading.show();
   var _condigHeader = {
     headers: {
         'Authorization': 'Basic 23423432',
@@ -87,9 +88,11 @@ $scope.loginData={};
                     
                     $scope.ListData = response;
                     if(response.data.success==true){
+                       $ionicLoading.hide();
                       $scope.message="success";
+                      $state.go("draw");
                     }
-                    else{ $scope.message=$scope.ListData.data.message;}
+                    else{ $scope.message=$scope.ListData.data.message;$ionicLoading.hide();}
 
                    
                    
@@ -103,11 +106,12 @@ $scope.create=function(){
 
  
 })
-.controller('SignupCtrl', function($scope, $ionicModal, $timeout,$state,$http) {
+.controller('SignupCtrl', function($scope,$ionicLoading, $ionicModal, $timeout,$state,$http) {
 $scope.data={};
 
 
  $scope.continue=function(){
+  
     $scope.themduoc=true;
         $scope.firstnamenull="b";
         $scope.lastnamenull="b";
@@ -146,10 +150,12 @@ $scope.data={};
     else{$scope.companynull="a";$scope.themduoc=false;}
 
     if($scope.themduoc==true){
+      $ionicLoading.show();
 
 
 
 var _condigHeader = {
+
     headers: {
         'Authorization': 'Basic 23423432',
         'Access-Control-Allow-Headers':'Origin; X-Requested-With; Content-Type; Accept',
@@ -178,16 +184,18 @@ var _condigHeader = {
                     
                     $scope.ListData = response;
                     if($scope.ListData.data.success==true){
+                        $ionicLoading.hide();
                    $state.go("signupdetail");
                  
                     }
-                    else{ $scope.message=$scope.ListData.data.message}
+                    else{ $scope.message=$scope.ListData.data.message;$ionicLoading.hide();}
                 });
 
      
      
 
     }
+
 
  }
 
@@ -201,7 +209,7 @@ $scope.haveaccount=function(){
 
  
 })
-.controller('SignupdetailCtrl', function($scope,$http, $ionicPlatform,$ionicModal, $timeout,$state,$cordovaDevice) {
+.controller('SignupdetailCtrl', function($scope,$http,$ionicLoading, $ionicPlatform,$ionicModal, $timeout,$state,$cordovaDevice) {
   
   $scope.data={}; 
   document.addEventListener("deviceready", function () {
@@ -223,6 +231,7 @@ $scope.haveaccount=function(){
 
 $scope.themduoc=true;
     $scope.save=function(){
+
       $scope.themduoc=true;
       $scope.companyphonenull="b";
       $scope.streetaddressnull="b";
@@ -250,6 +259,7 @@ $scope.themduoc=true;
    
 
     if($scope.themduoc==true){
+       
 
       var _condigHeader = {
     headers: {
@@ -292,11 +302,13 @@ $scope.themduoc=true;
                     
                     $scope.ListData = response;
                     if($scope.ListData.data.success==true){
+                     
                         window.localStorage.setItem("message",$scope.ListData.data.message);
                    $state.go("chucmung");
                   
                     }
-                    else{ $scope.message=$scope.ListData.data.message
+                    else{ $scope.message=$scope.ListData.data.message;
+                   
                      }
                 });
 
@@ -313,7 +325,7 @@ $scope.themduoc=true;
 })
 
 .controller('ChucmungCtrl', function($scope,$http, $ionicPlatform,$ionicModal, $timeout,$state,$cordovaDevice) {
-
+  
 $scope.message=window.localStorage.getItem("message");
  $scope.login=function(){
                     window.localStorage.removeItem("company");
@@ -328,7 +340,108 @@ $scope.message=window.localStorage.getItem("message");
 
 })
 
+.controller('DrawCtrl', function($scope,$http, $ionicPlatform,$ionicModal, $timeout,$state,$cordovaDevice) {
 
+$scope.data={};
+$scope.data.drawline=false;
+$scope.data.draw=false;
+function changeObjectSelection(value) {
+  canvas.forEachObject(function (obj) {
+    obj.selectable = value;
+  });
+  canvas.renderAll();
+}
+
+function removeEvents() {
+  canvas.isDrawingMode = false;
+  canvas.selection = false;
+  canvas.off('mouse:down');
+  canvas.off('mouse:up');
+  canvas.off('mouse:move');
+}
+
+
+
+ $scope.mode=function(){
+
+if($scope.data.draw==0){
+  removeEvents();
+  changeObjectSelection(true);
+  canvas.selection = true;}
+   if($scope.data.draw==1){
+     if($scope.data.drawline==true){
+
+          removeEvents();
+          changeObjectSelection(false);
+          canvas.isDrawingMode=true;
+            }else{ 
+              drawSquare();
+            }
+
+ 
+}
+ 
+
+}
+
+
+
+
+
+var canvas = new fabric.Canvas('c',  {selection: false}  );
+function drawSquare() {
+  removeEvents();
+  changeObjectSelection(false);
+
+var circle, isDown, origX, origY;
+
+
+
+canvas.on('mouse:down', function(o){
+  isDown = true;
+  var pointer = canvas.getPointer(o.e);
+  origX = pointer.x;
+  origY = pointer.y;
+     circle = new fabric.Rect({ 
+        width: 0, 
+        height: 0, 
+         left: pointer.x,
+         top: pointer.y,
+         strokeWidth: 5,
+         stroke: 'red',
+         selection: false  ,
+        originX: 'center', originY: 'center'
+    });
+
+  canvas.add(circle);
+});
+
+canvas.on('mouse:move', function(o){
+
+
+ if (!isDown) return;
+
+    var mouse = canvas.getPointer(o.e);
+
+    var w = Math.abs(origX- mouse.x),
+    h = Math.abs(origY- mouse.y);
+
+    if (!w || !h) {
+        return false;
+    }
+
+    circle.set('width', w).set('height', h);
+    canvas.renderAll(); 
+});
+
+canvas.on('mouse:up', function(o){
+  isDown = false;
+});
+}
+ $scope.clear=function(){
+canvas.clear();
+}
+})
 .controller('PlaylistsCtrl', function($scope) {
   $scope.playlists = [
     { title: 'Reggae', id: 1 },

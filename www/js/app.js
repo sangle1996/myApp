@@ -44,6 +44,7 @@ angular.module('starter', ['ionic', 'starter.controllers'])
                         controller: 'SignupdetailCtrl'
                     })
     ////sign up
+  
       /////congratulate
       .state('chucmung', {
                         url: '/chucmung',
@@ -51,6 +52,13 @@ angular.module('starter', ['ionic', 'starter.controllers'])
                         controller: 'ChucmungCtrl'
                     })
     /////congratulate
+       ///// DRAW
+      .state('draw', {
+                        url: '/draw',
+                        templateUrl: 'templates/draw.html',
+                        controller: 'DrawCtrl'
+                    })
+    /////DRAW
     .state('app', {
     url: '/app',
     abstract: true,
