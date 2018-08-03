@@ -210,7 +210,7 @@ $scope.haveaccount=function(){
 
     var cordova = $cordovaDevice.getCordova();
 
-    var model = $cordovaDevice.getModel();
+     $scope.model = $cordovaDevice.getModel();
 
     var platform = $cordovaDevice.getPlatform();
 
@@ -270,7 +270,7 @@ $scope.themduoc=true;
                         "phone":$scope.data.companyphone,
                         "state":$scope.data.sta,
                         "zipcode":$scope.data.zipcode},
-                        "device":(!angular.isUndefined($scope.uuid)) ? $scope.uuid : ionic.Platform.platform()+ionic.Platform.version(),
+                        "device":(!angular.isUndefined($scope.model)) ? $scope.model : ionic.Platform.platform()+ionic.Platform.version(),
                         "profile":{"company_name":window.localStorage.getItem("company"),
                         "email":window.localStorage.getItem("email"),
                         "first_name":window.localStorage.getItem("firstname"),
