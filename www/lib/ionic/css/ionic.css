@@ -8303,7 +8303,7 @@ input:checked + .checkbox-icon:after {
   height: 43px;
   outline: none;
   background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ccc), color-stop(100%, #ccc));
-  background: linear-gradient(to right, #ccc 0%, #ccc 100%);
+  
   background-position: center;
   background-size: 99% 2px;
   background-repeat: no-repeat;

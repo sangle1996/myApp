@@ -1,16 +1,24 @@
 <ion-modal-view style="background-color:rgba(40, 30, 30, 0.08)">
+
   <ion-header-bar style="background-color: #111;">
-   <center > <font class="title" style="color: white">DRAW</font></center>
-    <div class="buttons">
-      <button class="button button-clear" ng-click="closeLogin()">Close</button>
-    </div>
+    
+
+
+
+   <!--<center> <font class="title" style="color: white">DRAW</font></center>-->
+     <button  class="button button-clear button-positive">Save</button>
   </ion-header-bar>
   <ion-content>
-
-  <canvas id="c" width="500" height="500" style="border:1px solid #ccc"></canvas>
+  <canvas id="c"  width="360" height="300" style="border:1px solid #ccc"></canvas>
+  
 
 <!--   DRAW OR DRAG   -->
-<div class="row">
+ 
+ 
+
+ <div class="row">
+
+  <!-- COl -->
   <div class="col">
 <div class="row">
   <label class="toggle">
@@ -21,7 +29,19 @@
 </label>
  DRAW 
 </div>
-<div class="row">
+<div class="row" style="margin: 0">
+  <label class="toggle toggle-positive">
+   <input type="checkbox" ng-model="data.drawcircle" ng-click="mode();">
+   <div class="track">
+     <div class="handle"></div>
+   </div>
+</label>
+  DRAW</br> CIRCLE
+</div>
+</div>
+<!-- COl -->
+<div class="col">
+<div class="row" style="margin: 0">
   <label class="toggle toggle-calm">
    <input type="checkbox" ng-model="data.drawline" ng-click="mode()">
    <div class="track">
@@ -30,12 +50,58 @@
 </label>
  DRAW LINE
 </div>
+ <a class="button button-icon icon ion-edit" ng-click="Addtext()"></a>
+</div>
+<!-- COl -->
+<div class="row" style="margin: 0">
+  <label class="toggle toggle-positive">
+   <input type="checkbox" ng-model="data.ruler" ng-click="ruler();setzoom(data.zoom)">
+   <div class="track">
+     <div class="handle"></div>
+   </div>
+</label>
+  RULER
+
+</div>
+</div>  
+
+
+<div class="row" style="margin: 0" ng-if="data.drawline">
+  <label class="toggle toggle-positive">
+   <input type="checkbox" ng-model="data.hide"  ng-click="mode()">
+   <div class="track">
+     <div class="handle"></div>
+   </div>
+</label>
+  HIDE
+
 </div>
 
- 
-
-  <button class="button button-assertive" ng-click="clear()">clear</button> 
+<div class="row" >
+<input type="color" id="myColor" onchange="changecolor()" >
 </div>
+
+    
+  <div class="row" style="height: 53px;" >
+    <a class="button button-icon icon ion-trash-a" ng-click="clear()"></a>
+ <!-- <a class="button button-outline button-balanced" ng-click="saveImg()">save</br>img</a> -->
+
+ <a class="button button-icon icon ion-android-download ion-ios7-download" ng-click="saveJson()"></a>
+  <!--<a class="button button-outline button-balanced" ng-click="loadJson()">load</br>json</a>-->
+
+  <button class="button button-outline button-positive icon ion-upload"  file-browser> upload </button>
+
+  <div ng-if="data.ruler" class="range" style="width: 150px;padding-top: 0px;">
+    <input type="range"  ng-model="data.zoom" ng-style="stylecolorzoom" ng-change="setzoom(data.zoom);setzoomobject(data.zoom)"  min="{{zoomless}}"  max="{{zoommax}}">
+    <i class="icon"  ></i>
+  </div>
+  </div>
+ <div class="range" ng-if="data.draw">
+    <input  ng-style="stylecolor"  type="range"   ng-change="setlevel(value)"  ng-model="value" min="{{min}}"  max="{{max}}">
+   
+  </div>
+
+
   
   </ion-content>
 </ion-modal-view>
