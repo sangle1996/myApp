@@ -341,7 +341,7 @@ $scope.message=window.localStorage.getItem("message");
 })
 
 .controller('DrawCtrl', function($cordovaFile,$rootScope,$scope,$http, $ionicPlatform,$ionicModal, $timeout,$state,$cordovaDevice) {
-
+$scope.reset=false;
 $scope.data={};
 $scope.data.drawline=false;
 $scope.data.draw=false;
@@ -350,6 +350,10 @@ function changeObjectSelection(value) {
   canvas.forEachObject(function (obj) {
     obj.selectable = value;
   });
+  var objects = canvas.getObjects('image');
+           for (let i in objects) {
+             objects[i].selectable=false;
+           }
   canvas.renderAll();
 }
 
@@ -366,16 +370,15 @@ function removeEvents() {
 $scope.value = 10;// default size off brush
 $scope.min = 5;  // min size off brush
 $scope.max = 90;// max size off brush
-$scope.stylecolor= {'background':'linear-gradient(to right, red '+ parseInt((($scope.value-5)/85)*100)+'%, #ccc '+ parseInt(1-(($scope.value-5)/85))*100+'%)','background-size':'99% 2px','background-repeat': 'no-repeat','background-position': 'center'};
+$scope.stylecolor= {'background':'linear-gradient(to right, red '+ parseInt((($scope.value-5)/85)*100)+'%, #ccc 0%)','background-size':'95% 2px','background-repeat': 'no-repeat','background-position': 'center'};
 ///////// MIN MAX DRAW
 $scope.setlevel=function(value){
-  $scope.stylecolor= {'background':'linear-gradient(to right, red '+ parseInt(((value-5)/85)*100)+'%, #ccc '+ parseInt(1-((value-5)/85))*100+'%)','background-size':'99% 2px','background-repeat': 'no-repeat','background-position': 'center'};
+  $scope.stylecolor= {'background':'linear-gradient(to right, red '+ parseInt(((value-5)/85)*100)+'%, #ccc 0%)','background-size':'95% 2px','background-repeat': 'no-repeat','background-position': 'center'};
     //$scope.stylecolor= {'background-size':'99% 2px'};
 $scope.value=value;
 canvas.freeDrawingBrush.width=Math.abs($scope.value);// the value on change and remake the size of brush
 // do need the renderALL();
 
-console.log($scope.stylecolor);
 }
 
 
@@ -391,24 +394,31 @@ $scope.data.drawline=false;
 if($scope.data.draw==0){
   removeEvents();
   changeObjectSelection(true);
-  canvas.selection = true;
      $scope.data.drawline=false;
      $scope.data.drawcircle=false;
      $scope.data.drawtext=false;
+     $scope.data.arrow=false;
+    
 }
    if($scope.data.draw==1){
-
+   
      if($scope.data.drawline&&!$scope.data.drawcircle&&!$scope.data.drawtext){
         
           drawingLine();
          
            $scope.data.drawline=true;
+          
 
             }
-            else if($scope.data.drawcircle&&!$scope.data.drawtext)
+            else if($scope.data.drawcircle&&!$scope.data.drawtext&&!$scope.data.arrow)
             {
              
               drawCircle();
+            }
+            else if($scope.data.arrow&&!$scope.data.drawtext)
+            {
+
+              drawArrow();
             }
              else if($scope.data.drawtext)
             {
@@ -426,66 +436,127 @@ if($scope.data.draw==0){
 
 
 changecolor= function() {
+  if(data.drawline){
     drawingLine();
+  }
   };
 
 
 
 
-var canvas = new fabric.Canvas('c',  {selection: false}  );
+var canvas = new fabric.Canvas('c',  {selection: false}  );////  CREATE NEW CANVAS.
 
 
 
 
-/// BEGIN DRAWING LINE
+/////// BEGIN: SET BACKGROUND
+$scope.background;
+var copbg=$rootScope.$on("uploadbg",function(event, opt){
+              canvas.clear().renderAll();
+               canvas.backgroundColor=document.getElementById("myColorbg").value;
+              fabric.Image.fromURL(opt.a, function(img) {
+                  // add background image
+                  $scope.background=img;
+                   var center = canvas.getCenter();///get center value
+         
+             if(img.width<img.height){      //////// check size to fit image
+      
+                 img1=img.set({
+
+                    scaleX: canvas.width/(img.width+(img.height-(canvas.height+(img.width-canvas.width)))),
+                    scaleY: canvas.height/img.height,
+                    top: center.top,
+                    left: center.left,
+                    originX: 'center',
+                    originY: 'center',
+                    selectable:false
+           
+             });  
+                   canvas.add(img1);
+             }
+      if(img.width>=img.height){
+            img1=img.set({
+
+                        scaleX: canvas.width/img.width,
+                        scaleY: canvas.height/(img.height+(img.width-(canvas.width+(img.height-canvas.height)))),
+                        top: center.top,
+                        left: center.left,
+                        originX: 'center',
+                        originY: 'center',
+                        selectable:false
+
+             });  
+            canvas.add(img1);
+             }
+         
+           });
+             
+                      });
+ $scope.$on('$destroy', function() {
+                       copbg();
+                    });
+/////// END: SET BACKGROUND. 
+
+
+changecolorbg= function() {
+    canvas.backgroundColor=document.getElementById("myColorbg").value;
+    canvas.renderAll();
+  };
+
+
+     
+/// BEGIN: DRAWING LINE
 var drawingLine= function(){
         canvas.discardActiveObject();
-      removeEvents();
-      changeObjectSelection(false);
-       canvas.selection=false;
+        removeEvents();
+        changeObjectSelection(false);
+        canvas.selection=false;
         canvas.isDrawingMode=true;
-       // get hide=false cause undifine in first call with ng-if of drawline=false
+       
         
         if($scope.data.drawline&&!$scope.data.hide){
+
           canvas.freeDrawingBrush.color=document.getElementById("myColor").value;
+
           }
-else if($scope.data.drawline&&$scope.data.hide)
- 
-{
+          else if($scope.data.drawline&&$scope.data.hide){
 
-     canvas.freeDrawingBrush.color="transparent";
-     canvas.on('mouse:move', function(o){
-       canvas.freeDrawingBrush.color=document.getElementById("myColor").value;
-     });
-     canvas.on('mouse:up', function(o){
-       canvas.freeDrawingBrush.color="transparent";
-     });
+                canvas.freeDrawingBrush.color="transparent";
+                canvas.on('mouse:move', function(o){
+
+                         canvas.freeDrawingBrush.color=document.getElementById("myColor").value;
+
+                                                      });
+                canvas.on('mouse:up', function(o){
+
+                         canvas.freeDrawingBrush.color="transparent"; 
+
+                                                });
+
+                      }
+
 
 }
+/// END: DRAWING LINE
 
 
-}
-/// BEGIN DRAWING LINE
-
-
-/// BEGIN DRAWING TEXT
-
-
-       $scope.Addtext = function () {
+/// BEGIN: DRAWING TEXT
+$scope.Addtext = function () {
 
                 removeEvents();
                 changeObjectSelection(false);
                 var colors = document.getElementById("myColor").value;
              
-// create a rectangle object
-                        var itext = new fabric.IText('This is a IText object', {
-                         left: 100,
-                         top: 150,
-                         fill: '#D81B60',
-                         strokeWidth: 1,
-                          stroke: "#880E4F",
-                        });
 
+                var itext = new fabric.IText('This is a IText object', {
+
+                 left: 100,
+                 top: 150,
+                 fill: '#D81B60',
+                 strokeWidth: 1,
+                  stroke: "#880E4F",
+
+                });
                      
 
                 canvas.add(itext).setActiveObject(itext);
@@ -493,25 +564,16 @@ else if($scope.data.drawline&&$scope.data.hide)
                 canvas.on('mouse:down', function(e) {console.log("donotthing")});
                
                  canvas.on('text:selection:changed', function(e) {
+
                   console.log('change', e.target, e);
                   canvas.setActiveObject(itext);
                  
-});             
+                                                                 });             
                 $scope.data.draw=false;
                 $scope.mode();
 
-
-
-
-
-
-
-
             };
-
-
-
-/// BEGIN DRAWING TEXT
+/// END: DRAWING TEXT
 
 
 
@@ -523,85 +585,99 @@ else if($scope.data.drawline&&$scope.data.hide)
     $scope.zoomless=30;// min zoom
     $scope.zoommax=120;// max zoom
 $scope.ruler=function(){
+
   /////// ALL CHANGE ZOOM WITH FUNCTION:"setzoom" 
  $scope.setzoom=function(intzoom){
 
-  if($scope.data.ruler){
-var xobj = {};
-var xtext = {};
-var yobj = {};
-var ytext = {};
-var ytext = {};
-var xs=[];
-var ys=[];
+
+   if($scope.data.ruler){
+                var xobj = {};
+                var xtext = {};
+                var yobj = {};
+                var ytext = {};
+                var ytext = {};
+                var xs=[];
+                var ys=[];
 
 
-for(var i=parseInt(intzoom);i<=500;i+=parseInt(intzoom)){
+             for(var i=parseInt(intzoom);i<=500;i+=parseInt(intzoom)){
  
 ///////////// stripe  AND RULER X
   
-
 ///rulerx
-   var text = new fabric.Text(i.toString(), {
-      fontFamily: 'Comic Sans',
-      fontSize: 15,
-      width: 1, 
-      height: 1000 , 
-      left: i-10,
-      top: 0,
-    });
-   xtext=text;
-   xs.push(xtext);
+                    var text = new fabric.Text(i.toString(), { 
+
+                       fontFamily: 'Comic Sans',
+                       fontSize: 15,
+                       width: 1, 
+                       height: 1000 , 
+                       left: i-10,
+                       top: 0,
+                       selectable: false
+
+                                                           });                  
+                     xtext=text;
+                     xs.push(xtext);
 ///rulerx
 
 
 ///rulery
-   var texty = new fabric.Text(i.toString(), {
-      fontFamily: 'Comic Sans',
-      fontSize: 15,
-      width: 1000, 
-      height: 1 , 
-      left: 0,
-      top: i-10,
-    });
-   ytext=texty;
-   xs.push(ytext);
+                     var texty = new fabric.Text(i.toString(), {
+                        fontFamily: 'Comic Sans',
+                        fontSize: 15,
+                        width: 1000, 
+                        height: 1 , 
+                        left: 0,
+                        top: i-10,
+                        selectable: false
+                                                              });
+                     ytext=texty;
+                     xs.push(ytext);
 ///rulery
   
    
-   x = new fabric.Rect({ 
-         width: 1, 
-         height: 1000 , 
-         left: i,
-         top: 15,
-         fill :'rgba(204, 204, 204, 1)'
-    });
-   xobj=x;
-   xs.push(xobj);
-///////////// stripe  AND RULER X
+                   x = new fabric.Rect({ 
+                         width: 1, 
+                         height: 1000 , 
+                         left: i,
+                         top: 15,
+                         fill :'rgba(204, 204, 204, 1)',
+                        selectable: false
+                    });
+                   xobj=x;
+                   xs.push(xobj);
+                
+                              
+                    y = new fabric.Rect({ 
+                         width: 1000, 
+                         height: 1 , 
+                        left: 15,
+                        top: i,
+                        fill :'rgba(204, 204, 204, 1)',
+                        selectable: false
 
-     y = new fabric.Rect({ 
-         width: 1000, 
-         height: 1 , 
-         left: 15,
-         top: i,
-         fill :'rgba(204, 204, 204, 1)'
-    });
-    yobj=y;
-    xs.push(yobj);
+                    });
+                    yobj=y;
+                    xs.push(yobj);
 
    
 }
+                
 
-var alltogetherObj = new fabric.Group(xs);
+                 var alltogetherObj = new fabric.Group(xs);
+                
 
- canvas.setBackgroundImage(alltogetherObj);
- canvas.renderAll(); 
+                   canvas.setBackgroundImage(alltogetherObj);
+                  
+                 canvas.renderAll();      
+
 }
-else{ canvas.backgroundImage = false;
-canvas.renderAll(); }
+else{
+                 canvas.backgroundImage = false;
+                 canvas.renderAll(); 
     }
-  }
+    }
+    }
 
 ////// END: ADD THE RULER
 var objects = canvas.getObjects();
@@ -634,8 +710,12 @@ canvas.calcOffset();
 
 } 
 */
+
+
+
 ///UPLOAD object ( CAN EDIT THE CANVAS THAT SAVED )
- var cop=$rootScope.$on("upload",function(event, opt){
+ var cop=$rootScope.$on("upload",function(event, opt){  
+                     console.log('up');
                      $scope.loadJson(opt.a); 
                       });
                  $scope.$on('$destroy', function() {
@@ -643,6 +723,82 @@ canvas.calcOffset();
 });
   ///UPLOAD object ( CAN EDIT THE CANVAS THAT SAVED )
 
+
+
+//////BEGIN: DRAWING RULER
+ var drawArrow= function () {
+                removeEvents();
+                changeObjectSelection(false);
+                function drawArrow(fromx, fromy, tox, toy) {
+                    var angle = Math.atan2(toy - fromy, tox - fromx);
+                    var headlen = 5;  // arrow head size
+                    // bring the line end back some to account for arrow head.
+                    tox = tox - (headlen) * Math.cos(angle);
+                    toy = toy - (headlen) * Math.sin(angle);
+                    // calculate the points.
+                    var points = [
+                        {
+                            x: fromx, // start point
+                            y: fromy
+                        }, {
+                            x: fromx - (headlen / 4) * Math.cos(angle - Math.PI / 2),
+                            y: fromy - (headlen / 4) * Math.sin(angle - Math.PI / 2)
+                        }, {
+                            x: tox - (headlen / 4) * Math.cos(angle - Math.PI / 2),
+                            y: toy - (headlen / 4) * Math.sin(angle - Math.PI / 2)
+                        }, {
+                            x: tox - (headlen) * Math.cos(angle - Math.PI / 2),
+                            y: toy - (headlen) * Math.sin(angle - Math.PI / 2)
+                        }, {
+                            x: tox + (headlen) * Math.cos(angle), // tip
+                            y: toy + (headlen) * Math.sin(angle)
+                        }, {
+                            x: tox - (headlen) * Math.cos(angle + Math.PI / 2),
+                            y: toy - (headlen) * Math.sin(angle + Math.PI / 2)
+                        }, {
+                            x: tox - (headlen / 4) * Math.cos(angle + Math.PI / 2),
+                            y: toy - (headlen / 4) * Math.sin(angle + Math.PI / 2)
+                        }, {
+                            x: fromx - (headlen / 4) * Math.cos(angle + Math.PI / 2),
+                            y: fromy - (headlen / 4) * Math.sin(angle + Math.PI / 2)
+                        }, {
+                            x: fromx,
+                            y: fromy
+                        }
+                    ];
+                    var colors = document.getElementById("myColor").value;
+                    var pline = new fabric.Polyline(points, {
+
+                        fill: colors,
+                        stroke: colors,
+                        opacity: 1,
+                        strokeWidth: 1,
+                        originX: 'left',
+                        originY: 'top',
+                        selectable: false
+                    });
+                    canvas.add(pline);
+                    canvas.renderAll();
+                }
+
+                canvas.on('mouse:down', function () {
+                    var pointer = canvas.getPointer(event.e);
+                    startX = pointer.x;
+                    startY = pointer.y;
+                });
+                canvas.on('mouse:move', function () {
+
+                });
+                canvas.on('mouse:up', function () {
+                    var pointer = canvas.getPointer(event.e);
+                    endX = pointer.x;
+                    endY = pointer.y;
+                    drawArrow(startX, startY, endX, endY);
+
+
+                });
+            };  
+/////END: DRAWING RULER
 
   ////// DRAW SQUARE
 function drawSquare() { 
@@ -656,6 +812,7 @@ var square, isDown, origX, origY;
 
 
 canvas.on('mouse:down', function(o){
+  $scope.reset=true;
   var colors = document.getElementById("myColor").value;
 
   isDown = true;
@@ -711,6 +868,8 @@ canvas.on('mouse:up', function(o){
 
   ////// DRAW SQUARE
 
+
+
   ////// DRAW SIRCLE
 
   function drawCircle() { 
@@ -757,6 +916,27 @@ canvas.on('mouse:up', function(o){
   ////// DRAW SIRCLE
 
 
+////// BEGIN: BACKWARD
+            var isRedoing = false;
+            var h = [];
+            $scope.Undo = function () {
+                if (canvas._objects.length > 0) {
+
+                    h.push(canvas._objects.pop());
+                    canvas.renderAll();
+
+                }
+            };
+            $scope.Redo = function () {
+                //console.log(canvas.getObjects());
+                if (h.length > 0) {
+                    isRedoing = true;
+                    canvas.add(h.pop());
+                }
+            };
+
+
+
 /// SAVE IMAGE
 $scope.saveImg=function(){    
 console.log('export image');
@@ -774,7 +954,7 @@ else {
 
 ////SAVE JSON AS TEXT
 $scope.saveJson=function(){    
- canvas.backgroundImage = null;
+canvas.backgroundImage = false;
 saveText(JSON.stringify(canvas.toJSON()), "test.txt" );
 }
 
@@ -794,7 +974,6 @@ function saveText(text, filename){
     });
 
 }
-
 ////SAVE JSON AS TEXT
 
 
@@ -899,7 +1078,71 @@ $scope.loadJson=function(obj){
             });
         }
     };
-});
+})
 
 /////////////UPLOAD OBJECT
+/////////////UPLOAD IMAGE BG
+.factory('readFilebg', function ($window,$rootScope, $q) {
+    'use strict';
+    var readFilebg = function (file) {
+       
+        var deferred = $q.defer(),  
+            reader = new $window.FileReader();
+
+        reader.onload = function (ev) {
+            var content = ev.target.result;
+            deferred.resolve(content);
+        };
+     
+         reader.readAsDataURL(file);
+         
+
+        return deferred.promise;
+    };
+
+    return readFilebg;
+})
+.directive('fileHandlerbg', function (readFilebg) {
+    'use strict';
+
+    return {
+        link: function (scope, element) {
+            element.on('change', function (event) {
+                var file = event.target.files[0];
+                readFilebg(file).then(function (content) {
+                    console.log(content);
+                });
+            });
+        }
+    };
+})
+.directive('fileBrowserbg', function (readFilebg,$rootScope) {
+
+    'use strict';
+
+
+    return {
+        template: '<input  type="file" accept="image/*" style="display: none;" />' +
+            '<ng-transclude></ng-transclude>',
+        transclude: true,
+        link: function (scope, element) {
+            var fileInput = element.children('input[file]');
+          
+            fileInput.on('change', function (event) {
+                var file = event.target.files[0];
+               
+                readFilebg(file).then(function (content) {
+                 $rootScope.$broadcast("uploadbg", { a: content});
+                 
+                });
+            });
+            
+            element.on('click', function () {
+                fileInput[0].click();
+            });
+        }
+    };
+});
+
+/////////////UPLOAD IMAGE BG
 
