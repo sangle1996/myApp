@@ -2,18 +2,18 @@
 
 
 .hoverWrapper  {
- display: block;
- background-color: #387ef557; 
- position: absolute;
- border-radius: 10%;
- left: 210px;
- top: 300px;
+    display: block;
+    background-color: #387ef557; 
+    position: absolute;
+    border-radius: 10%;
+    left: 210px;
+    top: 300px;
 }
 .brushlevel  {
- display: block;
- position: absolute;
- left: 60px;
- top: 490px;
+    display: block;
+    position: absolute;
+    left: 60px;
+    top: 490px;
 }
 .ruler, .ruler li {
     margin: 0;
@@ -118,7 +118,7 @@ input.b[type=text] {
     width: 100%;
     padding: 12px 20px;
     margin: 8px 0;
-    box-sizing: border-box;
+    box-sizing: border-box; 
     border: none;
     border-bottom: 1px solid #808080;
 }
