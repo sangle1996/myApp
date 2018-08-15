@@ -366,13 +366,17 @@ var mousedown= function(){
 }
 //////////MOUSE DOWN
 
+      ////LIST SHAPE
 
+        $scope.listshape=["square","circle","multi","arrow"];
+
+
+      ////LIST SHAPE
     //  MODE DRAW LINE, DRAW CIRCLE,...
-    $scope.data.drawline = false;
-    $scope.mode = function(isdraw,line,circle,arrow,text) {
+    $scope.mode = function(isdraw,shape) {
    
       if (!$scope.data.draw) {
-
+       
         removeEvents();
         changeObjectSelection(true);
         mousedown();
@@ -380,68 +384,53 @@ var mousedown= function(){
 
 
 
-        $scope.data.drawline = false;
-        $scope.data.drawcircle = false;
-        $scope.data.arrow = false;
       }
-      if ($scope.data.draw) {
-         $scope.showitext = false;
-        $scope.data.draw=true;
-        $scope.show = false;
+      if (isdraw) {
 
+          $scope.data.draw=true;
 
-        if (line) {
-          if($scope.data.linearrow)
-          { 
+        if (shape=="square") {
+         
+           drawLinearrow();
+        
+              drawSquare();
+         
 
-            drawLinearrow();
-          }else{
-          drawingLine();
-         $scope.data.drawline = true;
-         $scope.data.drawcircle = false;
-         $scope.data.arrow = false;
-         }
+        }else if(shape=="arrow"){
 
-        } else if (circle) {
+          drawLinearrow();
+
+        } else if (shape=="circle") {
 
 
           drawCircle();
-        $scope.data.drawcircle = true;
-        $scope.data.drawline = false;
-        $scope.data.arrow = false;
 
 
-        } else if (arrow) {
+        } else if (shape=="multi") {
 
 
           drawArrow();
-         $scope.data.arrow = true;
-        $scope.data.drawline = false;
-        $scope.data.drawcircle = false;
-      
-
-       
-
-
 
 
         }  else {
-          drawSquare();
+          drawingLine();
         }
       }
     }
     //  MODE DRAW LINE, DRAW CIRCLE,...
     /////  CHANGE COLOR BRUSH
     changecolor = function() {
-      canvas.getActiveObject().set("stroke",document.getElementById("myColor").value); 
-        
-      if (canvas.getActiveObject().text) {
+        if(canvas.getActiveObject()){
+      canvas.getActiveObject().set("stroke",document.getElementById("myColor").value);  
+      if (canvas.getActiveObject().get("type")=="text") {
+
         canvas.getActiveObject().set("fill",document.getElementById("myColor").value);
       }
+    }
+        canvas.freeDrawingBrush.color = document.getElementById("myColor").value;
       canvas.requestRenderAll();
-      if (data.drawline) {
-        drawingLine();
-      }
+        
+      
     };
     /////  CHANGE COLOR BRUSH
     var canvas = new fabric.Canvas('c', {
@@ -582,17 +571,13 @@ var mousedown= function(){
       changeObjectSelection(false);
       canvas.selection = false;
       canvas.isDrawingMode = true;
-      if ($scope.data.drawline && !$scope.data.hide) {
         canvas.freeDrawingBrush.color = document.getElementById("myColor").value;
-      } else if ($scope.data.drawline && $scope.data.hide) {
-        canvas.freeDrawingBrush.color = "transparent";
-        canvas.on('mouse:move', function(o) {
+       canvas.on('mouse:down', function(o) {
           canvas.freeDrawingBrush.color = document.getElementById("myColor").value;
         });
-        canvas.on('mouse:up', function(o) {
-          canvas.freeDrawingBrush.color = "transparent";
+      canvas.on('mouse:move', function(o) {
+          canvas.freeDrawingBrush.color = document.getElementById("myColor").value;
         });
-      }
     }
     /// END: DRAWING LINE\
 
@@ -899,21 +884,21 @@ var drawLinearrow= function(){
         if (line) {
             console.log(line);
           line = new fabric.Line([line.get('x2'), line.get('y2'), pointer.x, pointer.y], {
-            stroke: '#0000ff',
+            stroke: document.getElementById("myColor").value,
             lockMovementX: true,
             lockMovementY: true,
             strokeWidth: 3,
-            selectable: true,
+            selectable: false,
             hoverCursor: 'default'
           });
           canvas.add(line);
         } else {
           line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
-            stroke: '#0000ff',
+            stroke: document.getElementById("myColor").value,
             lockMovementX: true,
             strokeWidth: 3,
             lockMovementY: true,
-            selectable: true,
+            selectable: false,
             hoverCursor: 'default'
           });
           canvas.add(line);
