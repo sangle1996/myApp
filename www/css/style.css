@@ -1,7 +1,7 @@
 /* Empty. Add your own CSS if you like */
 .imgshape{
-    max-width:65%;
-  max-height:65%;
+    max-width:30px;
+  max-height:30px;
 }
 
 
@@ -33,7 +33,7 @@
     position: absolute;
  
     top:310px;
-    left:20px;
+    left:60px;
     background: rgba(0, 0, 0, 0.2 );
 }
 .shape-show-hide.ng-hide-remove {
