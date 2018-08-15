@@ -1,30 +1,133 @@
 /* Empty. Add your own CSS if you like */
 
 
-.hoverWrapper  {
+
+.itext {
+    overflow: auto;
+    display: block; 
+    position: absolute;
+    width: 360px;
+    height: 40px;
+    top:0px;
+    left: 0;
+    background: rgba(0, 0, 0, 0.2 );
+}
+.itext-show-hide.ng-hide-remove {
+  transform: rotateX(90deg);
+  transform-origin: top;
+  transition: all 0.5s ease;
+
+}
+
+.itext-show-hide.ng-hide-remove.ng-hide-remove-active {
+  transform: rotateY(0);
+}
+
+
+.shape {
+   
+    display: block; 
+    position: absolute;
+ 
+    top:310px;
+    left:85px;
+    background: rgba(0, 0, 0, 0.2 );
+}
+.shape-show-hide.ng-hide-remove {
+  transform: rotateX(90deg);
+  transform-origin: bottom;
+  transition: all 0.3s ease;
+
+
+}
+
+
+.shape-show-hide.ng-hide-remove-active {
+  transform: rotateY(0);
+}
+
+    
+
+
+
+
+
+
+
+.option {
     display: block;
-    background-color: #387ef557; 
+    position: absolute;
+    width: 20px;
+    height: 30px;
+    top:340px;
+    left: 0;
+    background: rgba(255, 255, 255, 1);
+}
+
+
+
+.object {
+    overflow: auto;
+    display: block; 
+    position: absolute;
+    width: 360px;
+    height: 300px;
+    top:30px;
+    left: 0;
+    background: rgba(0, 0, 0, 0.2 );
+}
+  /*  .funky-show-hide.ng-hide-add {
+      transform: rotateZ(0);
+      transform-origin: right;
+      transition: all 0.5s ease-in-out;
+      
+    }*/
+
+
+.funky-show-hide.ng-hide-remove {
+  transform: rotateX(90deg);
+  transform-origin: bottom;
+  transition: all 0.5s ease;
+
+}
+
+.funky-show-hide.ng-hide-remove.ng-hide-remove-active {
+  transform: rotateY(0);
+}
+    
+
+
+
+.hoverWrapper {
+    display: block;
+    background-color: #387ef557;
     position: absolute;
     border-radius: 10%;
     left: 210px;
     top: 300px;
 }
-.brushlevel  {
+
+.brushlevel {
     display: block;
     position: absolute;
     left: 60px;
     top: 490px;
 }
-.ruler, .ruler li {
+
+.ruler,
+.ruler li {
     margin: 0;
     padding: 0;
     list-style: none;
     display: inline-block;
 }
+
 /* IE6-7 Fix */
-.ruler, .ruler li {
+.ruler,
+.ruler li {
     *display: inline;
 }
+
 .ruler {
     background: #fff;
     border-radius: 2px;
@@ -33,8 +136,9 @@
     height: 2em;
     padding-right: 20px;
     white-space: nowrap;
-    font-size:9px;
+    font-size: 9px;
 }
+
 .ruler li {
     padding-left: 30px;
     width: 2em;
@@ -42,6 +146,7 @@
     text-align: center;
     position: relative;
 }
+
 .ruler li:before {
     content: '';
     position: absolute;
@@ -51,49 +156,42 @@
     right: 1em;
 }
 
-
-
 s {
-    width:100%;
+    width: 100%;
     position: absolute;
-    bottom:0;
-    
-  
+    bottom: 0;
 }
+
 img {
     position: relative;
     display: block;
-    
-  	width: 100px;
+    width: 100px;
 }
 
 .a::-webkit-input-placeholder {
- 
-  color: #9932CC;
-  font-weight: bold;	
-  font-style: italic;
-
-
-  
+    color: #9932CC;
+    font-weight: bold;
+    font-style: italic;
 }
+
 input.a[type=text] {
-	background-image:url(../img/chamthan.png); 
-	background-repeat: no-repeat; 
-	background-size: 30px;
-	background-position: right;
+    background-image: url(../img/chamthan.png);
+    background-repeat: no-repeat;
+    background-size: 30px;
+    background-position: right;
     width: 100%;
     padding: 12px 20px;
     margin: 8px 0;
     box-sizing: border-box;
     border: none;
     border-bottom: 1px solid #9932CC;
+}
 
-}
 input.a[type=password] {
-	background-image:url(../img/chamthan.png); 
-	background-repeat: no-repeat; 
-	background-size: 30px;
-	background-position: right;
+    background-image: url(../img/chamthan.png);
+    background-repeat: no-repeat;
+    background-size: 30px;
+    background-position: right;
     width: 100%;
     padding: 12px 20px;
     margin: 8px 0;
@@ -101,11 +199,12 @@ input.a[type=password] {
     border: none;
     border-bottom: 1px solid #9932CC;
 }
+
 input.a[type=email] {
-	background-image:url(../img/chamthan.png); 
-	background-repeat: no-repeat; 
-	background-size: 30px;
-	background-position: right;
+    background-image: url(../img/chamthan.png);
+    background-repeat: no-repeat;
+    background-size: 30px;
+    background-position: right;
     width: 100%;
     padding: 12px 20px;
     margin: 8px 0;
@@ -118,10 +217,11 @@ input.b[type=text] {
     width: 100%;
     padding: 12px 20px;
     margin: 8px 0;
-    box-sizing: border-box; 
+    box-sizing: border-box;
     border: none;
     border-bottom: 1px solid #808080;
 }
+
 input.b[type=password] {
     width: 100%;
     padding: 12px 20px;
@@ -129,7 +229,8 @@ input.b[type=password] {
     box-sizing: border-box;
     border: none;
     border-bottom: 1px solid #808080;
-} 
+}
+
 input.b[type=email] {
     width: 100%;
     padding: 12px 20px;
@@ -137,8 +238,4 @@ input.b[type=email] {
     box-sizing: border-box;
     border: none;
     border-bottom: 1px solid #808080;
-} 
-
-
-
-
+}
