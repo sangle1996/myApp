@@ -1,5 +1,8 @@
 /* Empty. Add your own CSS if you like */
-
+.imgshape{
+    max-width:65%;
+  max-height:65%;
+}
 
 
 .itext {
@@ -30,13 +33,13 @@
     position: absolute;
  
     top:310px;
-    left:85px;
+    left:20px;
     background: rgba(0, 0, 0, 0.2 );
 }
 .shape-show-hide.ng-hide-remove {
-  transform: rotateX(90deg);
+  transform: rotateY(90deg);
   transform-origin: bottom;
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
 
 
 }
@@ -61,7 +64,7 @@
     height: 30px;
     top:340px;
     left: 0;
-    background: rgba(255, 255, 255, 1);
+    background: rgba(0, 0, 0, 0.07);
 }
 
 
@@ -111,7 +114,7 @@
     display: block;
     position: absolute;
     left: 60px;
-    top: 490px;
+    top: 460px;
 }
 
 .ruler,
