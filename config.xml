@@ -85,5 +85,6 @@
     <plugin name="cordova-plugin-file" spec="^6.0.1" />
     <plugin name="cordova-plugin-statusbar" spec="^2.4.2" />
     <plugin name="cordova-save-image-gallery" spec="0.0.26" />
+    <plugin name="cordova-plugin-fullscreen" spec="^1.2.0" />
     <engine name="android" spec="^7.0.0" />
 </widget>
