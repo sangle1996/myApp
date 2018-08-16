@@ -1,5 +1,5 @@
 <ion-modal-view style="background-color:rgba(40, 30, 30, 0.08)">
-  <ion-header-bar style="background-color: #111;">
+  <ion-header-bar class="headerbar" style="background-color: #111;">
     <button ng-click="Undo()" class=" button button-positive button-icon icon ion-reply"></button>
     <!--<center> <font class="title" style="color: white">DRAW</font></center>-->
     <button ng-click="Redo()" style="text-align:right" class=" button button-positive button-icon icon ion-forward"></button>
@@ -7,7 +7,7 @@
   <ion-content>
     <canvas id="c" ng-style="canvas" width="360" height="370" style="border:1px solid #ccc"></canvas>
     <!--   DRAW OR DRAG   -->
-    <div class="row">
+    <div class="row editsquare">
       <!-- COl -->
       <div class="col">
         <div class="row">
@@ -16,95 +16,61 @@
             <div class="track">
               <div class="handle"></div>
             </div>
-          </label> DRAW </div>
-        
-       
-         <div class="row" style="margin: 0">
+          </label>D</div>
+        <div class="row" style="margin: 0">
           <label class="toggle toggle-positive">
             <input type="checkbox" ng-model="data.ruler" ng-click="ruler();setzoom(data.zoom)">
             <div class="track">
               <div class="handle"></div>
             </div>
-          </label> RULER </div>
-
-        <input  type="color" id="myColor" onchange="changecolor()" style="margin-left:7px">
+          </label>R</div>
+          <div style="position:relative; display:inline-block">
+            <button type="button" class="button button-outline"><img class="imgshape" src="../img/brush.png"></button>
+            <input type="color"  id="myColor" onchange="changecolor()"  style="opacity:0; position:absolute; left:0;top:0;width:100%">
+            </div>
+        
       </div>
       <!-- COl -->
       <div class="col">
-        <button class="button button-icon icon"  ng-click="showshape=!showshape;mode(1,0)">
-          <img  class="imgshape"  src="../img/shape.png">  
+        <button class="button button-icon icon" ng-click="showshape=!showshape;showstraight=false;mode(1,0)">
+          <img class="imgshape" src="../img/shape.png">
         </button>
-
-
-
-        <div class="shape shape-show-hide" ng-show="showshape">
-          <div class="row">
-              <button class="button button-light button-outline"  ng-repeat="shape in listshape" ng-click="mode(1,shape)"><center><img  class="imgshape"  src="../img/{{shape}}.png"></center></button>
-
-
-            <!--
-        <div class="row" style="margin: 0">
-          <label class="toggle toggle-calm">
-            <input type="checkbox" ng-model="data.drawline" ng-click="mode(0,data.drawline,0,0)">
-            <div class="track">
-              <div class="handle"></div>
-            </div>
-          </label> DRAW FREE </div>
-
-
-          <div class="row" style="margin: 0">
-          <label class="toggle toggle-positive">
-            <input type="checkbox" ng-model="data.drawcircle" ng-click="mode(0,0,data.drawcircle,0);">
-            <div class="track">
-              <div class="handle"></div>
-            </div>
-          </label> DRAW</br> CIRCLE </div>
-
-
-            <div class="row" style="margin: 0">
-          <label class="toggle toggle-positive">
-            <input type="checkbox" ng-model="data.arrow" ng-click="mode(0,0,0,data.arrow)">
-            <div class="track">
-              <div class="handle"></div>
-            </div>
-          </label> SQUARE </div>
-        --> 
-          </div>
-          </div>  
-
-
-      <button class="button button-outline" ng-click="fill()"><img  class="imgshape"  src="../img/fill.png"></button>
-       
+        <button class="button button-outline" ng-click="fill()"><img class="imgshape" src="../img/fill.png"></button>
       </div>
       <!-- COl -->
-
       <div class="col">
+        <button class="button button-icon icon" ng-click="showstraight=!showstraight;showshape=false;mode(1,0)">
+          <img class="imgshape" src="../img/straight.png">
+        </button>
+        <button class="button button-icon icon" ng-click="saveImg()">
+          <img class="imgshape" src="../img/download.png">
+        </button>
+     
+      </div>
+      <!-- COl -->
+      <div class="col">
+        <button class="button button-outline" ng-click="Addtext()"><img class="imgshape" src="../img/text.png"></center></button>
+        <!---  --->
+        <div class="row">
+            <div style="position:relative; display:inline-block">
+            <button type="button" class="button button-outline"><img class="imgshape" src="../img/color.png"></button>
+            <input type="color"  id="myColorbg" onchange="changecolorbg()"  style="opacity:0; position:absolute; left:0;top:0;width:100%">
+            </div>
 
-           <button class="button button-outline" ng-click="Addtext()"><img  class="imgshape"  src="../img/text.png"></center></button>
-        
-      
-         
-            
-              
-              <div class="row"><input type="color" id="myColorbg" onchange="changecolorbg()" style="margin-left:2px "></div>
-        
-        <div ng-if="data.ruler" class="range hoverWrapper" ng-if="data.ruler">
-          <input type="range" ng-model="data.zoom" ng-style="stylecolorzoom" ng-change="setzoom(data.zoom);setzoomobject(data.zoom)" min="{{zoomless}}" max="{{zoommax}}">
-        </div>
+          </div>
+          <!---  --->
       </div>
       <div class="col">
-          <button class="button button-icon  icon ion-image col" file-browserbg>
+        <button class="button button-icon  icon ion-image col" file-browserbg>
       </div>
-
     </div>
-    <div class="row" style="height: 53px;">
+    <div class="row edit" style="height: 53px;">
       <a class="button button-icon icon ion-trash-a col" ng-click="clear()"></a>
       <!-- <a class="button button-outline button-balanced" ng-click="saveImg()">save</br>img</a> -->
       <a class="button button-icon icon ion-android-download ion-ios7-download col" ng-click="saveJson()"></a>
       <!--<a class="button button-outline button-balanced" ng-click="loadJson()">load</br>json</a>-->
       <button class="button button-icon icon ion-upload col" file-browser>
-      <button class="button button-icon icon ion-close-round col" ng-click="delete()"> 
-        
+        <button class="button button-icon icon ion-close-round col" ng-click="delete()">
     </div>
     <div class="range brushlevel" ng-if="data.draw">
       <input ng-style="stylecolor" type="range" ng-change="setlevel(value)" ng-model="value" min="{{min}}" max="{{max}}">
@@ -113,19 +79,47 @@
       <ion-list class="object funky-show-hide" ng-show="show">
         <div class="row">
           <ion-item class="col col-50" ng-repeat="value in paraobjects track by $index" ng-click="selectobject({{$index}},value.type)">
-            <center><img src="{{value.image}}" height="50%"></img> </center> </ion-item>
+            <center><img src="{{value.image}}" height="50%"></img> </center>
+          </ion-item>
         </div>
       </ion-list>
     </div>
+<!---- -->    
     <a class="itext itext-show-hide" ng-show="showitext">
-       <div class="row">
-        <button  class="button button-small button-assertive" ng-click="dtEditText('bold')">Bold</button>
-        <button  class="button button-small button-assertive" ng-click="dtEditText('italic')">Italic</button>
-        <select  ng-options="item as item for item in font " ng-model="item" ng-change="update(item)">
-        <input type="text" ng-click="input()"   ng-change="textedit(data.text)"  id="Javascript_example" class="col" ng-model="data.text">
+      <div class="row">
+        <button class="button button-small button-assertive" ng-click="dtEditText('bold')">Bold</button>
+        <button class="button button-small button-assertive" ng-click="dtEditText('italic')">Italic</button>
+        <select ng-options="item as item for item in font " ng-model="item" ng-change="update(item)">
+          <input type="text" ng-click="input()" ng-change="textedit(data.text)" id="Javascript_example" class="col" ng-model="data.text">
       </div>
-     
-     
     </a>
+<!---- -->
+    <div class="shape shape-show-hide" ng-show="showshape">
+      <div class="row">
+        <button class="button button-light button-outline" ng-repeat="shape in listshape" ng-click="mode(1,shape)">
+          <center><img class="imgshape" src="../img/{{shape}}.png"></center>
+        </button>
+        
+      </div>
+    </div>
+<!---- -->
+    <div ng-if="data.ruler" class="range hoverWrapper" ng-if="data.ruler">
+      <input type="range" ng-model="data.zoom" class="ranges" ng-style="stylecolorzoom" ng-change="setzoom(data.zoom);setzoomobject(data.zoom)" min="{{zoomless}}" max="{{zoommax}}">
+    </div>
+
+<!---- -->
+    <div class="shape shape-show-hide" ng-show="showstraight">
+      <div class="row">
+
+      <button class="button button-light button-outline" ng-repeat="straight in liststraight" ng-click="mode(1,straight)">
+          <center><img class="imgshape" src="../img/{{straight}}.png"></center>
+        </button>
+
+         
+
+      </div>
+    </div>
+
+
   </ion-content>
 </ion-modal-view>
