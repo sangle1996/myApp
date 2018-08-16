@@ -1,8 +1,8 @@
 <ion-modal-view style="background-color:rgba(40, 30, 30, 0.08)">
   <ion-header-bar class="headerbar" style="background-color: #111;">
-    <button ng-click="Undo()" class=" button button-positive button-icon icon ion-reply"></button>
+    <button ng-click="Undo()" class="button button-positive button-icon icon ion-reply "></button>
     <!--<center> <font class="title" style="color: white">DRAW</font></center>-->
-    <button ng-click="Redo()" style="text-align:right" class=" button button-positive button-icon icon ion-forward"></button>
+    <button ng-click="Redo()" style="text-align:right" class="button button-positive button-icon icon ion-forward "></button>
   </ion-header-bar>
   <ion-content>
     <canvas id="c" ng-style="canvas" width="360" height="370" style="border:1px solid #ccc"></canvas>
@@ -35,7 +35,7 @@
         <button class="button button-icon icon" ng-click="showshape=!showshape;showstraight=false;mode(1,0)">
           <img class="imgshape" src="../img/shape.png">
         </button>
-        <button class="button button-outline" ng-click="fill()"><img class="imgshape" src="../img/fill.png"></button>
+        <button class="button button-outline" style="border-color: black;border-style:dashed;" ng-click="fill()"><img class="imgshape" src="../img/fill.png"></button>
       </div>
       <!-- COl -->
       <div class="col">
@@ -62,7 +62,9 @@
       </div>
       <div class="col">
         <button class="button button-icon  icon ion-image col" file-browserbg>
+         <button class="button button-outline" ng-click="setfill()"><img class="imgshape" src="../img/fill.png"></button>
       </div>
+
     </div>
     <div class="row edit" style="height: 53px;">
       <a class="button button-icon icon ion-trash-a col" ng-click="clear()"></a>
@@ -115,10 +117,17 @@
           <center><img class="imgshape" src="../img/{{straight}}.png"></center>
         </button>
 
+
+
          
 
       </div>
     </div>
+
+    <!-----  -->
+     <button ng-click="Undo()" class=" button button-positive button-icon icon ion-reply undo"></button>
+    <!--<center> <font class="title" style="color: white">DRAW</font></center>-->
+    <button ng-click="Redo()"  class="button button-positive button-icon icon ion-forward redo"></button>
 
 
   </ion-content>
