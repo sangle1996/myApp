@@ -6,22 +6,23 @@
         height: 160% !important;
     }
 
+
     div.edit {
         overflow: auto;
         position: absolute;
         width: 270px;
         height: 100px;
         top: 0px;
-        left: 0px;
+        left: -10px;
     }
 
     div.editsquare {
         overflow: auto;
         position: absolute;
-        width: 358px;
+        width: 360px;
         height: 100px;
         top: 0px;
-        left: 253px;
+        left: 250px;
         background: rgba(0, 0, 0, 0.2);
     }
 
@@ -99,6 +100,23 @@
     div.shape-show-hide.ng-hide-remove-active {
         transform: rotateY(0);
     }
+    div.zoom {
+        display: block;
+        position: absolute;
+        top: 220px;
+        left: 430px;
+        background:rgba(255, 255, 255, 0.47)
+    }
+
+    div.zoom-show-hide.ng-hide-remove {
+        transform: rotateY(90deg);
+        transform-origin: bottom;
+        transition: all 0.5s ease;
+    }
+
+    div.zoom-show-hide.ng-hide-remove-active {
+        transform: rotateY(0);
+    }
 
     div.hoverWrapper {
         display: block;
@@ -138,8 +156,12 @@
         top: 50px;
         background: rgba(0, 0, 0, 0.2) !important;
     }
+    button.buttonzoom{
+    display: none;
+        }
 
     ::-webkit-scrollbar {
+         resize: both;
         -webkit-appearance: none;
         width: 25px;
     }
@@ -149,6 +171,15 @@
         background-color: rgba(0, 0, 0, 0.5);
         -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
     }
+     
+}
+
+
+.zoom{
+    display: none;
+}
+.buttonzoom{
+    display: none;
 }
 .undo{
     display: none;
@@ -221,10 +252,10 @@
     background: rgba(0, 0, 0, 0.2);
 }
 
-/*  .funky-show-hide.ng-hide-add {
-      transform: rotateZ(0);
+ /* .funky-show-hide.ng-hide-add {
+      transform: rotate(0);
       transform-origin: right;
-      transition: all 0.5s ease-in-out;
+      transition: all 0.5s ease;
       
     }*/
 .funky-show-hide.ng-hide-remove {

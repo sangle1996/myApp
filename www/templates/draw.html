@@ -6,6 +6,7 @@
   </ion-header-bar>
   <ion-content>
     <canvas id="c" ng-style="canvas" width="360" height="370" style="border:1px solid #ccc"></canvas>
+
     <!--   DRAW OR DRAG   -->
     <div class="row editsquare">
       <!-- COl -->
@@ -36,6 +37,8 @@
           <img class="imgshape" src="../img/shape.png">
         </button>
         <button class="button button-outline" style="border-color: black;border-style:dashed;" ng-click="fill()"><img class="imgshape" src="../img/fill.png"></button>
+        <button class="button button-outline buttonzoom" ng-click="zoom=!zoom"><img class="imgshape" src="../img/zoom.png"></button>
+          
       </div>
       <!-- COl -->
       <div class="col">
@@ -62,7 +65,7 @@
       </div>
       <div class="col">
         <button class="button button-icon  icon ion-image col" file-browserbg>
-         <button class="button button-outline" ng-click="setfill()"><img class="imgshape" src="../img/fill.png"></button>
+         <button class="button button-light button-outline" ng-click="setfill()"><img  class="imgshape" src="../img/fill.png"></button>
       </div>
 
     </div>
@@ -128,6 +131,19 @@
      <button ng-click="Undo()" class=" button button-positive button-icon icon ion-reply undo"></button>
     <!--<center> <font class="title" style="color: white">DRAW</font></center>-->
     <button ng-click="Redo()"  class="button button-positive button-icon icon ion-forward redo"></button>
+  
+   <div draggable="true" class="zoom zoom-show-hide zoom-hide" ng-show="zoom" style="">
+      <div class="row">
+      <button class="button button-icon icon ion-plus-round" ng-click="Zoomin()" >
+          
+          <button class="button button-icon icon ion-refresh" ng-click="ResetZoom()" >
+         
+       <button class="button button-icon icon ion-minus-round" ng-click="Zoomout()" >
+        
+
+        
+      </div>
+    </div>
 
 
   </ion-content>

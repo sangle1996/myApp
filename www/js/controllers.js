@@ -284,24 +284,29 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         reload: true
       });
     }
-  }).controller('DrawCtrl', function($cordovaFile, $rootScope, $scope, $http, $ionicPlatform, $ionicModal, $timeout, $state, $cordovaDevice) {
+  }).controller('DrawCtrl', function($cordovaFile,$ionicLoading, $rootScope, $scope, $http, $ionicPlatform, $ionicModal, $timeout, $state, $cordovaDevice) {
     $scope.reset = false;
     $scope.data = {};
     $scope.data.drawline = false;
     $scope.data.draw = false;
-
+   
+   var a= function(){
      document.addEventListener('deviceready', function() {
         if (ionic.Platform.isAndroid()) {
 
            window.AndroidFullScreen.immersiveMode(successFunction, errorFunction);
+    }
 
     function successFunction() {
     }
 
     function errorFunction(error) {
       }
-        }
+        
       });
+   }  
+    a();
+   
         /* document.getElementById("c").setAttribute('width', screen.width-40+'!important');*/
       
    
@@ -324,11 +329,11 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       canvas.off('mouse:up');
       canvas.off('mouse:move');
     }
-    $scope.value = 10; // default size off brush
+    $scope.value = 1; // default size off brush
     $scope.min = 1; // min size off brush
-    $scope.max = 90; // max size off brush
+    $scope.max = 20; // max size off brush
     $scope.stylecolor = {
-      'background': 'linear-gradient(to right, red ' + parseInt((($scope.value - 5) / 85) * 100) + '%, #ccc 0%)',
+      'background': 'linear-gradient(to right, red ' + parseInt((($scope.value - 1) / 20) * 100) + '%, #ccc 0%)',
       'background-size': '95% 2px',
       'background-repeat': 'no-repeat',
       'background-position': 'center'
@@ -336,7 +341,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     ///////// MIN MAX DRAW BRUSH
     $scope.setlevel = function(value) {
       $scope.stylecolor = {
-        'background': 'linear-gradient(to right, red ' + parseInt(((value - 5) / 85) * 100) + '%, #ccc 0%)',
+        'background': 'linear-gradient(to right, red ' + parseInt(((value - 1) / 20) * 100) + '%, #ccc 0%)',
         'background-size': '95% 2px',
         'background-repeat': 'no-repeat',
         'background-position': 'center'
@@ -429,7 +434,6 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
 
         // add background image
         $scope.background = img;
-        console.log(canvas.width, canvas.height);
         var center = canvas.getCenter(); ///get center value
         if (img.width < img.height) { //////// check size to fit image
           img1 = img.set({
@@ -467,7 +471,8 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     /////// END: SET BACKGROUND
     /// BEGIN: BACKGROUND COLOR
     changecolorbg = function() {
-      canvas.backgroundColor = document.getElementById("myColorbg").value;
+
+      canvas.backgroundColor = document.getElementById("myColorbg").value;  
       canvas.renderAll();
     };
     //// END: BACKGROUND COLOR
@@ -702,11 +707,12 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       removeEvents();
       changeObjectSelection(false);
       $scope.data.draw = false;
-      var itext = new fabric.Text('This is a IText object', {
+      var itext = new fabric.Text('Text', {
         left: 100,
         top: 150,
         fill: '#000000',
         strokeWidth: 1,
+        fontSize:30,
         fontFamily: 'Helvetica'
       });
       canvas.add(itext);
@@ -795,7 +801,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     canvas.renderAll(); //reset
     $scope.data.zoom = 30; // default zoom
     $scope.zoomless = 30; // min zoom
-    $scope.zoommax = 120; // max zoom
+    $scope.zoommax = 60; // max zoom
     $scope.ruler = function() {
       $scope.setzoom = function(intzoom) { /////// ALL CHANGE ZOOM WITH FUNCTION:"setzoom" 
         if ($scope.data.ruler) {
@@ -913,6 +919,11 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         // console.log(canvas.getObjects().length);
         //console.log(canvas.getObjects().pop());
       });
+         canvas.on('mouse:up', function(o) {
+        canvas.renderAll();
+      });
+
+
     };
     /////END: DRAWING arrow
     /////BEGIN FILL
@@ -1081,6 +1092,104 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         canvas.add(h.pop());
       }
     };
+
+
+
+    //// BEGIN: ZOOM CANVAS
+    var canvasScale = 1; var SCALE_FACTOR = 1.2;
+    $scope.Zoomin = function () {
+                canvasScale = canvasScale * SCALE_FACTOR;
+
+                canvas.setHeight(canvas.getHeight() * SCALE_FACTOR);
+                canvas.setWidth(canvas.getWidth() * SCALE_FACTOR);
+
+                var objects = canvas.getObjects();
+                for (var i in objects) {
+                    var scaleX = objects[i].scaleX;
+                    var scaleY = objects[i].scaleY;
+                    var left = objects[i].left;
+                    var top = objects[i].top;
+
+                    var tempScaleX = scaleX * SCALE_FACTOR;
+                    var tempScaleY = scaleY * SCALE_FACTOR;
+                    var tempLeft = left * SCALE_FACTOR;
+                    var tempTop = top * SCALE_FACTOR;
+
+                    objects[i].scaleX = tempScaleX;
+                    objects[i].scaleY = tempScaleY;
+                    objects[i].left = tempLeft;
+                    objects[i].top = tempTop;
+
+                    objects[i].setCoords();
+                }
+
+                canvas.renderAll();
+            };
+            $scope.Zoomout = function () {
+                canvasScale = canvasScale / SCALE_FACTOR;
+                canvas.setHeight(canvas.getHeight() * (1 / SCALE_FACTOR));
+                canvas.setWidth(canvas.getWidth() * (1 / SCALE_FACTOR));
+
+                var objects = canvas.getObjects();
+                for (var i in objects) {
+                    var scaleX = objects[i].scaleX;
+                    var scaleY = objects[i].scaleY;
+                    var left = objects[i].left;
+                    var top = objects[i].top;
+
+                    var tempScaleX = scaleX * (1 / SCALE_FACTOR);
+                    var tempScaleY = scaleY * (1 / SCALE_FACTOR);
+                    var tempLeft = left * (1 / SCALE_FACTOR);
+                    var tempTop = top * (1 / SCALE_FACTOR);
+
+                    objects[i].scaleX = tempScaleX;
+                    objects[i].scaleY = tempScaleY;
+                    objects[i].left = tempLeft;
+                    objects[i].top = tempTop;
+
+                    objects[i].setCoords();
+                }
+
+                canvas.renderAll();
+            };
+            $scope.ResetZoom = function () {
+                canvas.setHeight(canvas.getHeight() * (1 / canvasScale));
+                canvas.setWidth(canvas.getWidth() * (1 / canvasScale));
+
+                var objects = canvas.getObjects();
+                for (var i in objects) {
+                    var scaleX = objects[i].scaleX;
+                    var scaleY = objects[i].scaleY;
+                    var left = objects[i].left;
+                    var top = objects[i].top;
+
+                    var tempScaleX = scaleX * (1 / canvasScale);
+                    var tempScaleY = scaleY * (1 / canvasScale);
+                    var tempLeft = left * (1 / canvasScale);
+                    var tempTop = top * (1 / canvasScale);
+
+                    objects[i].scaleX = tempScaleX;
+                    objects[i].scaleY = tempScaleY;
+                    objects[i].left = tempLeft;
+                    objects[i].top = tempTop;
+
+                    objects[i].setCoords();
+                }
+
+                canvas.renderAll();
+
+                canvasScale = 1;
+            };
+    ///// END: ZOOM CANVAS
+
+
+
+
+
+
+
+
+
     /// SAVE IMAGE
     $scope.saveImg = function() {
       if (!fabric.Canvas.supports('toDataURL')) {
@@ -1089,7 +1198,13 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         canvas.overlayImage = false;
         $scope.data.ruler = false;
         canvas.renderAll();
+        for(var i=0;i<5;i++){
+          $scope.Zoomin();
+        }  
+        console.log(canvas.toDataURL('image/jpeg'));
+        
         document.addEventListener('deviceready', function() {
+        
           var params = {
             data: canvas.toDataURL('jpg'),
             prefix: 'myPrefix_',
@@ -1099,11 +1214,16 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           };
           window.imageSaver.saveBase64Image(params, function(filePath) {
             console.log('File saved on ' + filePath);
+            
             alert("success save file:" + filePath);
+             
           }, function(msg) {
+            
             console.error(msg);
           });
+            $scope.ResetZoom();
         });
+          $scope.ResetZoom();
       }
     }
     /// SAVE IMAGE
@@ -1141,6 +1261,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       });
       removeEvents();
       canvas.renderAll();
+      a();
     };
     ///LOAD JSON
     ///DELETE 
@@ -1221,6 +1342,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
               a: content
             });
           });
+            element.children('input[file]').val(null);
         });
         element.on('click', function() {
           fileInput[0].click();
