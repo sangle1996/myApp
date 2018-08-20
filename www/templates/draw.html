@@ -37,6 +37,7 @@
           <img class="imgshape" src="../img/shape.png">
         </button>
         <button class="button button-outline" style="border-color: black;border-style:dashed;" ng-click="fill()"><img class="imgshape" src="../img/fill.png"></button>
+          <button class="button button-icon" ng-click="deletebg()" ><img class="imgshape" src="../img/deletebg.png"></button>
         <button class="button button-outline buttonzoom" ng-click="zoom=!zoom"><img class="imgshape" src="../img/zoom.png"></button>
           
       </div>
@@ -66,6 +67,7 @@
       <div class="col">
         <button class="button button-icon  icon ion-image col" file-browserbg>
          <button class="button button-light button-outline" ng-click="setfill()"><img  class="imgshape" src="../img/fill.png"></button>
+
       </div>
 
     </div>
@@ -77,8 +79,8 @@
       <button class="button button-icon icon ion-upload col" file-browser>
         <button class="button button-icon icon ion-close-round col" ng-click="delete()">
     </div>
-    <div class="range brushlevel" ng-if="data.draw">
-      <input ng-style="stylecolor" type="range" ng-change="setlevel(value)" ng-model="value" min="{{min}}" max="{{max}}">
+    <div class="range brushlevel">
+      <input ng-style="stylecolor" type="range"  ng-change="setlevel(data.value)" ng-model="data.value" min="{{min}}" max="{{max}}">
     </div>
     <div class="option " ng-click="objects()"><i class="icon ion-filing" style="font-size: 25px"></i>
       <ion-list class="object funky-show-hide" ng-show="show">
