@@ -77,7 +77,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           if (response.data.success == true) {
             $ionicLoading.hide();
             $scope.message = "success";
-            $state.go("draw");
+            $state.go("draw");  
           } else {
             $scope.message = $scope.ListData.data.message;
             $ionicLoading.hide();
@@ -305,6 +305,28 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         
       });
    }  
+document.addEventListener('deviceready', function() {
+
+    window.addEventListener("orientationchange", function() {
+    
+      if (ionic.Platform.isAndroid()) {
+
+           window.AndroidFullScreen.immersiveMode(successFunction, errorFunction);
+    }
+
+    function successFunction() {
+    }
+
+    function errorFunction(error) {
+      }
+        
+      
+    }, false);
+
+});
+
+
+
     a();
    
         /* document.getElementById("c").setAttribute('width', screen.width-40+'!important');*/
@@ -329,11 +351,11 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       canvas.off('mouse:up');
       canvas.off('mouse:move');
     }
-    $scope.value = 1; // default size off brush
+    $scope.data.value = 1; // default size off brush
     $scope.min = 1; // min size off brush
     $scope.max = 20; // max size off brush
     $scope.stylecolor = {
-      'background': 'linear-gradient(to right, red ' + parseInt((($scope.value - 1) / 20) * 100) + '%, #ccc 0%)',
+      'background': 'linear-gradient(to right, red ' + parseInt((($scope.data.value - 1) / 20) * 100) + '%, #ccc 0%)',
       'background-size': '95% 2px',
       'background-repeat': 'no-repeat',
       'background-position': 'center'
@@ -347,9 +369,14 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         'background-position': 'center'
       };
       //$scope.stylecolor= {'background-size':'99% 2px'};
-      $scope.value = value;
-      canvas.freeDrawingBrush.width = Math.abs($scope.value); // the value on change and remake the size of brush
-      // do need the renderALL(); 
+      $scope.data.value = value;
+      if(canvas.getActiveObject()){
+            canvas.getActiveObject().set("strokeWidth",Math.abs(value));
+            canvas.requestRenderAll();
+
+      }
+      canvas.freeDrawingBrush.width = Math.abs($scope.data.value); // the value on change and remake the size of brush
+     
     }
     //////// MIN MAX DRAW BRUSH
     ////////// MOUSE DOWN
@@ -360,10 +387,17 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         if (e.target) {
           if (e.target.get('type') === "text") {
             $scope.showitext = true;
-            $scope.data.text = e.target.text;
+          
             $scope.$evalAsync();
           } else {
             $scope.showitext = false;
+            $scope.data.value=e.target.strokeWidth;
+             $scope.stylecolor = {
+      'background': 'linear-gradient(to right, red ' + parseInt((($scope.data.value - 1) / 20) * 100) + '%, #ccc 0%)',
+      'background-size': '95% 2px',
+      'background-repeat': 'no-repeat',
+      'background-position': 'center'
+    };
             $scope.$evalAsync();
           }
         } else {
@@ -383,8 +417,8 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         changeObjectSelection(true);
         mousedown();
       } else if (isdraw) {
+        $scope.data.draw=true
         $scope.showitext = false;
-        $scope.data.draw = true;
         if (shape == "square") {
           drawSquare();
         } else if (shape == "circle") {
@@ -488,7 +522,6 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     $scope.show = false;
     $scope.objects = function() {
       changeObjectSelection(true);
-      $scope.data.draw = 0;
       $scope.show = !$scope.show;
       $scope.paraobjects = [];
       for (let i in canvas.getObjects()) {
@@ -538,7 +571,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
 
       function drawArrow(fromx, fromy, tox, toy) {
         var angle = Math.atan2(toy - fromy, tox - fromx);
-        var headlen = Math.abs($scope.value); // arrow head size
+        var headlen = Math.abs($scope.data.value); // arrow head size
         // bring the line end back some to account for arrow head.
         tox = tox - (headlen) * Math.cos(angle);
         toy = toy - (headlen) * Math.sin(angle);
@@ -581,7 +614,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           y: fromy
         }];
         var pline = new fabric.Polyline(points, {
-          strokeWidth: Math.abs($scope.value),
+          strokeWidth: Math.abs($scope.data.value),
           fill: document.getElementById("myColor").value,
           stroke: document.getElementById("myColor").value,
           opacity: 1,
@@ -613,7 +646,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
 
       function drawArrow(fromx, fromy, tox, toy) {
         var angle = Math.atan2(toy - fromy, tox - fromx);
-        var headlen = Math.abs($scope.value); // arrow head size
+        var headlen = Math.abs($scope.data.value); // arrow head size
         // bring the line end back some to account for arrow head.
         tox = tox - (headlen) * Math.cos(angle);
         toy = toy - (headlen) * Math.sin(angle);
@@ -647,7 +680,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           y: fromy
         }];
         var pline = new fabric.Polyline(points, {
-          strokeWidth: Math.abs($scope.value),
+          strokeWidth: Math.abs($scope.data.value),
           fill: document.getElementById("myColor").value,
           stroke: document.getElementById("myColor").value,
           opacity: 1,
@@ -681,7 +714,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         var pointer = canvas.getPointer(o.e);
         var points = [pointer.x, pointer.y, pointer.x, pointer.y];
         line = new fabric.Line(points, {
-          strokeWidth: Math.abs($scope.value),
+          strokeWidth: Math.abs($scope.data.value),
           fill: document.getElementById("myColor").value,
           stroke: document.getElementById("myColor").value,
           originX: 'center',
@@ -710,7 +743,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       var itext = new fabric.Text('Text', {
         left: 100,
         top: 150,
-        fill: '#000000',
+        fill: document.getElementById("myColor").value,
         strokeWidth: 1,
         fontSize:30,
         fontFamily: 'Helvetica'
@@ -892,7 +925,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
             stroke: document.getElementById("myColor").value,
             lockMovementX: true,
             lockMovementY: true,
-            strokeWidth: Math.abs($scope.value),
+            strokeWidth: Math.abs($scope.data.value),
             selectable: false,
             hoverCursor: 'default'
           });
@@ -901,7 +934,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
             stroke: document.getElementById("myColor").value,
             lockMovementX: true,
-            strokeWidth:  Math.abs($scope.value),
+            strokeWidth:  Math.abs($scope.data.value),
             lockMovementY: true,
             selectable: false,
             hoverCursor: 'default'
@@ -974,7 +1007,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           width: pointer.x - origX,
           height: pointer.y - origY,
           angle: 0,
-          strokeWidth: Math.abs($scope.value),
+          strokeWidth: Math.abs($scope.data.value),
           fill: $scope.colorfill($scope.sf),
           stroke: colors,
           selectable: false,
@@ -1028,7 +1061,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           ry: pointer.y - origY,
           angle: 0,
           stroke: document.getElementById("myColor").value,
-          strokeWidth: Math.abs($scope.value),
+          strokeWidth: Math.abs($scope.data.value),
           fill: $scope.colorfill($scope.sf),
           selectable: false,
           hasRotatingPoint: false
@@ -1093,7 +1126,20 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       }
     };
 
+////END: BACKWARD
+/////BEGIN: DELETE BG
+$scope.deletebg=function(){
+  if (canvas.getObjects('image')[0]) {
+     h.push(canvas.getObjects('image')[0]);
+    canvas.remove(canvas.getObjects('image')[0]); 
+    console.log(canvas.getObjects('image'));
+    canvas.renderAll();
+  }else{
+    alert("The canvas background is clean now!")
+  }
 
+}
+/////END: DELETE BG
 
     //// BEGIN: ZOOM CANVAS
     var canvasScale = 1; var SCALE_FACTOR = 1.2;
@@ -1186,19 +1232,19 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
 
 
 
-
-
-
-
     /// SAVE IMAGE
+
     $scope.saveImg = function() {
+  $ionicLoading.show();
       if (!fabric.Canvas.supports('toDataURL')) {
         alert('This browser doesn\'t provide means to serialize canvas to an image');
+
       } else {
+          $timeout(function () {
         canvas.overlayImage = false;
         $scope.data.ruler = false;
         canvas.renderAll();
-        for(var i=0;i<5;i++){
+        for(var i=0;i<3;i++){
           $scope.Zoomin();
         }  
         console.log(canvas.toDataURL('image/jpeg'));
@@ -1213,7 +1259,9 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
             mediaScanner: true
           };
           window.imageSaver.saveBase64Image(params, function(filePath) {
+            
             console.log('File saved on ' + filePath);
+          
             
             alert("success save file:" + filePath);
              
@@ -1222,9 +1270,16 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
             console.error(msg);
           });
             $scope.ResetZoom();
+           
+
         });
+
           $scope.ResetZoom();
+           $ionicLoading.hide()
+        },100);
+
       }
+
     }
     /// SAVE IMAGE
     ////SAVE JSON AS TEXT
