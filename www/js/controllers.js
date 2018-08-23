@@ -77,7 +77,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           if (response.data.success == true) {
             $ionicLoading.hide();
             $scope.message = "success";
-            $state.go("draw");  
+            $state.go("draw");
           } else {
             $scope.message = $scope.ListData.data.message;
             $ionicLoading.hide();
@@ -284,54 +284,40 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         reload: true
       });
     }
-  }).controller('DrawCtrl', function($cordovaFile,$ionicLoading, $rootScope, $scope, $http, $ionicPlatform, $ionicModal, $timeout, $state, $cordovaDevice) {
+  }).controller('DrawCtrl', function($cordovaFile, $ionicLoading, $rootScope, $scope, $http, $ionicPlatform, $ionicModal, $timeout, $state, $cordovaDevice) {
+    var canvas = new fabric.Canvas('c', {
+      selection: false,
+      backgroundColor: "white",
+    }); ////  CREATE NEW CANVAS.
     $scope.reset = false;
     $scope.data = {};
     $scope.data.drawline = false;
     $scope.data.draw = false;
-   
-   var a= function(){
-     document.addEventListener('deviceready', function() {
+    $scope.data.valueo = 1;
+    var a = function() {
+      document.addEventListener('deviceready', function() {
         if (ionic.Platform.isAndroid()) {
+          window.AndroidFullScreen.immersiveMode(successFunction, errorFunction);
+        }
 
-           window.AndroidFullScreen.immersiveMode(successFunction, errorFunction);
-    }
+        function successFunction() {}
 
-    function successFunction() {
-    }
-
-    function errorFunction(error) {
-      }
-        
+        function errorFunction(error) {}
       });
-   }  
-document.addEventListener('deviceready', function() {
-
-    window.addEventListener("orientationchange", function() {
-    
-      if (ionic.Platform.isAndroid()) {
-
-           window.AndroidFullScreen.immersiveMode(successFunction, errorFunction);
     }
+    document.addEventListener('deviceready', function() {
+      window.addEventListener("orientationchange", function() {
+        if (ionic.Platform.isAndroid()) {
+          window.AndroidFullScreen.immersiveMode(successFunction, errorFunction);
+        }
 
-    function successFunction() {
-    }
+        function successFunction() {}
 
-    function errorFunction(error) {
-      }
-        
-      
-    }, false);
-
-});
-
-
-
+        function errorFunction(error) {}
+      }, false);
+    });
     a();
-   
-        /* document.getElementById("c").setAttribute('width', screen.width-40+'!important');*/
-      
-   
+    /* document.getElementById("c").setAttribute('width', screen.width-40+'!important');*/
     // document.getElementById("c").width=screen.width-40;
     function changeObjectSelection(value) {
       canvas.forEachObject(function(obj) {
@@ -339,7 +325,9 @@ document.addEventListener('deviceready', function() {
       });
       var objects = canvas.getObjects('image');
       for (let i in objects) {
-        objects[i].selectable = false;
+        if (objects[i].get('id') == 'background') {
+          objects[i].selectable = false;
+        }
       }
       canvas.renderAll();
     }
@@ -354,6 +342,10 @@ document.addEventListener('deviceready', function() {
     $scope.data.value = 1; // default size off brush
     $scope.min = 1; // min size off brush
     $scope.max = 20; // max size off brush
+    $scope.sizebrush = {
+      'width': $scope.data.value,
+      'height': $scope.data.value
+    }
     $scope.stylecolor = {
       'background': 'linear-gradient(to right, red ' + parseInt((($scope.data.value - 1) / 20) * 100) + '%, #ccc 0%)',
       'background-size': '95% 2px',
@@ -368,15 +360,19 @@ document.addEventListener('deviceready', function() {
         'background-repeat': 'no-repeat',
         'background-position': 'center'
       };
+      $scope.sizebrush = {
+        'width': value + 'px',
+        'height': value + 'px',
+        'top': 'auto',
+        'left': (285 - value / 2) + 'px',
+      }
       //$scope.stylecolor= {'background-size':'99% 2px'};
       $scope.data.value = value;
-      if(canvas.getActiveObject()){
-            canvas.getActiveObject().set("strokeWidth",Math.abs(value));
-            canvas.requestRenderAll();
-
+      if (canvas.getActiveObject()) {
+        canvas.getActiveObject().set("strokeWidth", Math.abs(value));
+        canvas.requestRenderAll();
       }
       canvas.freeDrawingBrush.width = Math.abs($scope.data.value); // the value on change and remake the size of brush
-     
     }
     //////// MIN MAX DRAW BRUSH
     ////////// MOUSE DOWN
@@ -387,17 +383,37 @@ document.addEventListener('deviceready', function() {
         if (e.target) {
           if (e.target.get('type') === "text") {
             $scope.showitext = true;
-          
+            $scope.data.text = e.target.get('text');
             $scope.$evalAsync();
           } else {
+            if (e.target.get('id') != "img" && e.target.get('id') != "background" ) {
             $scope.showitext = false;
-            $scope.data.value=e.target.strokeWidth;
-             $scope.stylecolor = {
-      'background': 'linear-gradient(to right, red ' + parseInt((($scope.data.value - 1) / 20) * 100) + '%, #ccc 0%)',
-      'background-size': '95% 2px',
-      'background-repeat': 'no-repeat',
-      'background-position': 'center'
-    };
+            if (window.angular.isString(e.target.get('fill'))) {
+              $scope.data.fill = true;
+              $scope.data.colorfill = e.target.get('fill');
+            } else {
+              $scope.data.fill = false;
+            }
+            
+            
+              $scope.data.valueo = e.target.get('opacity');
+              $scope.isdashed = e.target.strokeDashArray;
+              $scope.data.value = e.target.strokeWidth;
+              console.log(e.target);
+              $scope.data.colorbrush = e.target.get('stroke');
+              e.target.set('padding', 20);
+              e.target.set('cornerSize', 20);
+              e.target.set('borderColor', '#E8E8E8');
+              e.target.set('cornerColor', '#44444487');
+              e.target.set('transparentCorners', true);
+              e.target.set('cornerStyle', 'circle'); //or rect
+            }
+            $scope.stylecolor = {
+              'background': 'linear-gradient(to right, red ' + parseInt((($scope.data.value - 1) / 20) * 100) + '%, #ccc 0%)',
+              'background-size': '95% 2px',
+              'background-repeat': 'no-repeat',
+              'background-position': 'center'
+            };
             $scope.$evalAsync();
           }
         } else {
@@ -405,7 +421,31 @@ document.addEventListener('deviceready', function() {
         }
       });
     }
-    //////////MOUSE DOWN
+    //////////MOUSE MOVE
+    /*    var blue = new fabric.Rect({
+       id:1,top: 60, left: 240, width: 10, height: 10, fill: 'blue',opacity :false,selectable:false });
+        canvas.add(blue);
+        canvas.renderAll();
+       var mousemove = function() {
+       canvas.on('mouse:move', function(e) {
+       var pointer = canvas.getPointer(event.e);
+
+       if(pointer.x>230){
+          
+           for(let i in canvas.getObjects()){
+             if(canvas.getObjects()[i].id==1)
+             {
+               canvas.getObjects()[i].set('opacity',true);
+             }
+           }
+           canvas.renderAll();  
+       }
+      
+
+
+       });
+     }*/
+    //////////MOUSE MOVE
     ////LIST SHAPE
     $scope.listshape = ["square", "circle", "multi"];
     $scope.liststraight = ["arrow", "arrows", "straight"];
@@ -416,9 +456,13 @@ document.addEventListener('deviceready', function() {
         removeEvents();
         changeObjectSelection(true);
         mousedown();
+        $scope.showshape=false;
+        $scope.showstraight=false;
       } else if (isdraw) {
-        $scope.data.draw=true
+        console.log(shape);
+        $scope.data.draw = true
         $scope.showitext = false;
+        $scope.shapes = shape;
         if (shape == "square") {
           drawSquare();
         } else if (shape == "circle") {
@@ -441,7 +485,7 @@ document.addEventListener('deviceready', function() {
     changecolor = function() {
       if (canvas.getActiveObject()) {
         canvas.getActiveObject().set("stroke", document.getElementById("myColor").value);
-        if (canvas.getActiveObject().get("type") == "text") {
+        if (canvas.getActiveObject().get("type") == "polyline") {
           canvas.getActiveObject().set("fill", document.getElementById("myColor").value);
         }
       }
@@ -449,14 +493,12 @@ document.addEventListener('deviceready', function() {
       canvas.requestRenderAll();
     };
     /////  CHANGE COLOR BRUSH
-    var canvas = new fabric.Canvas('c', {
-      selection: false,
-      backgroundColor: "white",
-    }); ////  CREATE NEW CANVAS.
     //////// BEGIN: CLEAN-BACKGROUND
     var cleanbackground = function() {
-      for (let i in canvas.getObjects('image')) {
-        canvas.remove(canvas.getObjects('image')[i]);
+      for (let i in canvas.getObjects()) {
+        if (canvas.getObjects()[i].get('id') == 'background') {
+          canvas.remove(canvas.getObjects('image')[i]);
+        }
       }
     }
     /////// END: CLEAN-BACKGROUND
@@ -465,12 +507,12 @@ document.addEventListener('deviceready', function() {
     var copbg = $rootScope.$on("uploadbg", function(event, opt) {
       cleanbackground();
       fabric.Image.fromURL(opt.a, function(img) {
-
         // add background image
         $scope.background = img;
         var center = canvas.getCenter(); ///get center value
         if (img.width < img.height) { //////// check size to fit image
           img1 = img.set({
+            id: 'background',
             scaleX: canvas.width / (img.width + (img.height - (canvas.height + (img.width - canvas.width)))),
             scaleY: canvas.height / img.height,
             top: center.top,
@@ -483,6 +525,7 @@ document.addEventListener('deviceready', function() {
         }
         if (img.width >= img.height) {
           img1 = img.set({
+            id: 'background',
             scaleX: canvas.width / img.width,
             scaleY: canvas.height / (img.height + (img.width - (canvas.width + (img.height - canvas.height)))),
             top: center.top,
@@ -495,7 +538,9 @@ document.addEventListener('deviceready', function() {
         }
         for (let i in canvas.getObjects('image')) //// send to back when created
         {
-          canvas.sendToBack(canvas.getObjects('image')[i]);
+          if (canvas.getObjects('image')[i].get('id') == 'background') {
+            canvas.sendToBack(canvas.getObjects('image')[i]);
+          }
         }
       });
     });
@@ -503,16 +548,128 @@ document.addEventListener('deviceready', function() {
       copbg();
     });
     /////// END: SET BACKGROUND
+    /////// BEGIN: IMPORT IMAGE
+    var copimage = $rootScope.$on("images", function(event, opt) {
+      $scope.mode(false, "");
+      $scope.data.draw = false;
+      fabric.Image.fromURL(opt.a, function(img) {
+        var center = canvas.getCenter(); ///get center value
+        if (img.width < img.height) { //////// check size to fit image
+          img1 = img.set({
+            id: 'img',
+            scaleX: canvas.width / (img.width + (img.height - (canvas.height + (img.width - canvas.width)))) - 0.1,
+            scaleY: canvas.height / img.height - 0.1,
+            top: center.top,
+            left: center.left,
+            originX: 'left',
+            originY: 'top',
+            padding: 20,
+            cornerSize: 20,
+            borderColor: '#E8E8E8',
+            cornerColor: '#44444487',
+            transparentCorners: true,
+            cornerStyle: 'circle', //or rect
+          });
+          canvas.add(img1);
+        }
+        if (img.width >= img.height) {
+          img1 = img.set({
+            id: 'img',
+            scaleX: canvas.width / img.width - 0.1,
+            scaleY: canvas.height / (img.height + (img.width - (canvas.width + (img.height - canvas.height)))) - 0.1,
+            top: center.top,
+            left: center.left,
+            originX: 'left',
+            originY: 'top',
+             padding: 20,
+            cornerSize: 20,
+            borderColor: '#E8E8E8',
+            cornerColor: '#44444487',
+            transparentCorners: true,
+            cornerStyle: 'circle', //or rect
+          });
+          canvas.add(img1);
+        }
+        canvas.renderAll();
+      });
+    });
+    $scope.$on('$destroy', function() {
+      copimage();
+    });
+    /////// END: IMPORT IMAGE
+    ////// BEGIN: SET LEVEL OPANCITY
+    $scope.setlevelo = function(value) {
+      if (canvas.getActiveObject()) {
+        canvas.getActiveObject().set('opacity', value);
+        canvas.renderAll();
+      }
+      $scope.opanlevel = {
+        'opacity': value
+      };
+    }
+    ////// END: SET LEVEL OPANCITY
     /// BEGIN: BACKGROUND COLOR
     changecolorbg = function() {
-
-      canvas.backgroundColor = document.getElementById("myColorbg").value;  
+      canvas.backgroundColor = document.getElementById("myColorbg").value;
       canvas.renderAll();
     };
     //// END: BACKGROUND COLOR
+    ///////BEGIN:COPY
+    $scope.Pass = function() {
+      _clipboard = "";
+      // clone again, so you can do multiple copies.
+      canvas.getActiveObject().clone(function(cloned) {
+        _clipboard = cloned;
+      });
+      _clipboard.clone(function(clonedObj) {
+        canvas.discardActiveObject();
+        clonedObj.set({
+          left: clonedObj.left + 10,
+          top: clonedObj.top + 10,
+          evented: true
+        });
+        if (clonedObj.type === 'activeSelection') {
+          // active selection needs a reference to the canvas.
+          clonedObj.canvas = canvas;
+          clonedObj.forEachObject(function(obj) {
+            obj.set('id', 'square');
+            canvas.add(obj);
+          });
+          // this should solve the unselectability
+          clonedObj.setCoords();
+        } else {
+          clonedObj.set('id', 'square');
+          canvas.add(clonedObj);
+        }
+        _clipboard.top += 10;
+        _clipboard.left += 10;
+        canvas.setActiveObject(clonedObj);
+        canvas.requestRenderAll();
+      });
+    };
+    ///////END:COPY
+    ///// BEGIN: HAVE DASHED
+    $scope.isdashed = false;
+    $scope.Dashed = function() {
+      console.log($scope.isdashed)
+      if ($scope.isdashed == false) {
+        $scope.isdashed = [10, 10];
+        canvas.freeDrawingBrush.strokeDashArray = $scope.isdashed;
+      } else if ($scope.isdashed != false) {
+        $scope.isdashed = false;
+        canvas.freeDrawingBrush.strokeDashArray = false;
+      }
+      if (canvas.getActiveObject()) {
+        if (canvas.getActiveObject().get('id') != 'img' && canvas.getActiveObject().get('type') != 'text') {
+          canvas.getActiveObject().set('strokeDashArray', $scope.isdashed);
+          canvas.renderAll();
+        }
+      }
+    }
+    ////// END : HAVE DASHED
     //// BEGIN: EVENT CLICK TO EDIT COLOR
     canvas.on('before:transform', function() {
-      document.getElementById("myColor").value = canvas.getActiveObject().stroke;
+      if (canvas.getActiveObject().get('id') != 'img') document.getElementById("myColor").value = canvas.getActiveObject().stroke;
       if (canvas.getActiveObject().get('type') == 'itext') {
         document.getElementById("myColor").value = canvas.getActiveObject().fill;
       }
@@ -532,7 +689,7 @@ document.addEventListener('deviceready', function() {
       }
     }
     $scope.selectobject = function(index, istext) {
-      if (canvas.item(index).get('type') != 'image') {
+      if (canvas.item(index).get('id') != 'background') {
         canvas.setActiveObject(canvas.item(index));
         canvas.item(index).bringToFront();
         console.log(istext);
@@ -548,6 +705,9 @@ document.addEventListener('deviceready', function() {
       }
     }
     //END : CONSOLE OBJECT
+    $scope.size = function() {
+      return ($scope.data.value > 5) ? $scope.data.value : 5;
+    }
     /// BEGIN: DRAWING LINE
     var drawingLine = function() {
       canvas.discardActiveObject();
@@ -568,74 +728,93 @@ document.addEventListener('deviceready', function() {
     var drawArrows = function() {
       removeEvents();
       changeObjectSelection(false);
-
-      function drawArrow(fromx, fromy, tox, toy) {
-        var angle = Math.atan2(toy - fromy, tox - fromx);
-        var headlen = Math.abs($scope.data.value); // arrow head size
-        // bring the line end back some to account for arrow head.
-        tox = tox - (headlen) * Math.cos(angle);
-        toy = toy - (headlen) * Math.sin(angle);
-        // calculate the points.
-        var points = [{
-          x: fromx, // start point
-          y: fromy
-        }, {
-          x: fromx + (headlen) * Math.cos(angle - Math.PI / 2),
-          y: fromy + (headlen) * Math.sin(angle - Math.PI / 2)
-        }, {
-          x: fromx - (headlen) * Math.cos(angle), // tip
-          y: fromy - (headlen) * Math.sin(angle)
-        }, {
-          x: fromx + (headlen) * Math.cos(angle + Math.PI / 2),
-          y: fromy + (headlen) * Math.sin(angle + Math.PI / 2)
-        }, {
-          x: fromx - (headlen / 4) * Math.cos(angle - Math.PI / 2),
-          y: fromy - (headlen / 4) * Math.sin(angle - Math.PI / 2)
-        }, {
-          x: tox - (headlen / 4) * Math.cos(angle - Math.PI / 2),
-          y: toy - (headlen / 4) * Math.sin(angle - Math.PI / 2)
-        }, {
-          x: tox - (headlen) * Math.cos(angle - Math.PI / 2),
-          y: toy - (headlen) * Math.sin(angle - Math.PI / 2)
-        }, {
-          x: tox + (headlen) * Math.cos(angle), // tip
-          y: toy + (headlen) * Math.sin(angle)
-        }, {
-          x: tox - (headlen) * Math.cos(angle + Math.PI / 2),
-          y: toy - (headlen) * Math.sin(angle + Math.PI / 2)
-        }, {
-          x: tox - (headlen / 4) * Math.cos(angle + Math.PI / 2),
-          y: toy - (headlen / 4) * Math.sin(angle + Math.PI / 2)
-        }, {
-          x: fromx - (headlen / 4) * Math.cos(angle + Math.PI / 2),
-          y: fromy - (headlen / 4) * Math.sin(angle + Math.PI / 2)
-        }, {
-          x: fromx,
-          y: fromy
-        }];
-        var pline = new fabric.Polyline(points, {
-          strokeWidth: Math.abs($scope.data.value),
-          fill: document.getElementById("myColor").value,
-          stroke: document.getElementById("myColor").value,
-          opacity: 1,
-          originX: 'left',
-          originY: 'top',
-          selectable: false
-        });
-        canvas.add(pline);
-        canvas.renderAll();
-      }
-      canvas.on('mouse:down', function() {
-        var pointer = canvas.getPointer(event.e);
-        startX = pointer.x;
-        startY = pointer.y;
+      const LineWithArrow = fabric.util.createClass(fabric.Line, {
+        _getCacheCanvasDimensions() {
+          var dim = this.callSuper('_getCacheCanvasDimensions');
+          dim.width += 100; // found by trial and error
+          dim.height += 100; // found by trial and error
+          return dim;
+        },
+        _render(ctx) {
+          this.callSuper('_render', ctx);
+          ctx.save();
+          const xDiff = this.x2 - this.x1;
+          const yDiff = this.y2 - this.y1;
+          this.callSuper('_render', ctx);
+          ctx.save();
+          const xDif = this.x2 - this.x1;
+          const yDif = this.y2 - this.y1;
+          const angles = Math.atan2(yDif, xDif);
+          ctx.translate((xDiff) / 2, (yDiff) / 2);
+          ctx.rotate(angles);
+          ctx.beginPath();
+          // Move 5px in front of line to start the arrow so it does not have the square line end showing in front (0,0)
+          ctx.moveTo($scope.size(), 0);
+          ctx.lineTo(-$scope.size(), $scope.size());
+          ctx.lineTo(-$scope.size(), -$scope.size());
+          ctx.closePath();
+          ctx.fillStyle = this.stroke;
+          ctx.fill();
+          ctx.restore();
+          //create arrow down
+          const angle = Math.atan2(yDiff, xDiff);
+          ctx.translate((xDiff) / -2, (yDiff) / -2);
+          ctx.rotate(angle);
+          ctx.beginPath();
+          ctx.moveTo(-$scope.size(), 0);
+          ctx.lineTo($scope.size(), -$scope.size());
+          ctx.lineTo($scope.size(), $scope.size());
+          ctx.closePath();
+          ctx.fillStyle = this.stroke;
+          ctx.fill();
+          ctx.restore();
+        }
       });
-      canvas.on('mouse:move', function() {});
-      canvas.on('mouse:up', function() {
-        var pointer = canvas.getPointer(event.e);
-        endX = pointer.x;
-        endY = pointer.y;
-        drawArrow(startX, startY, endX, endY);
+      const drawLineWithArrow = (points) => (new LineWithArrow(points, {
+        stroke: document.getElementById("myColor").value,
+        strokeWidth: Math.abs($scope.data.value),
+        cornerSize: 20,
+        borderColor: '#E8E8E8',
+        cornerColor: '#44444487',
+        transparentCorners: true,
+        cornerStyle: 'circle', //or rect
+        opacity: $scope.data.valueo,
+        strokeDashArray: $scope.isdashed,
+        selectable: false,
+        padding: 20, // hasRotatingPoint: false,
+        cornerSize: 20,
+        borderColor: '#E8E8E8',
+        cornerColor: '#CFCFCF',
+        transparentCorners: true,
+        cornerStyle: 'circle' //or rect
+        //                                hasBorders: false,
+        //                                hasControls: false
+      }));
+      const selectLine = (points) => {
+        return drawLineWithArrow(points);
+      };
+      let line;
+      let isDown;
+      canvas.on('mouse:down', (options) => {
+        isDown = true;
+        const pointer = canvas.getPointer(options.e);
+        const points = [$scope.standard(pointer.x,'x'), $scope.standard(pointer.y,'y'), $scope.standard(pointer.x,'x'),$scope.standard(pointer.y,'y')];
+        line = selectLine(points);
+        canvas.add(line).renderAll();
+      });
+      canvas.on('mouse:move', (options) => {
+        if (!isDown) return;
+        const pointer = canvas.getPointer(options.e);
+        line.set({
+          x2: $scope.standard(pointer.x,'x'),
+          y2: $scope.standard(pointer.y,'y')
+        });
+        canvas.renderAll();
+      });
+      canvas.on('mouse:up', () => {
+        isDown = false;
+        line.setCoords();
+        canvas.renderAll();
       });
     }
     ////// END: DRAW AROWSSSSSSSSSSSSSSS
@@ -643,65 +822,81 @@ document.addEventListener('deviceready', function() {
     var drawLinearrow = function() {
       removeEvents();
       changeObjectSelection(false);
-
-      function drawArrow(fromx, fromy, tox, toy) {
-        var angle = Math.atan2(toy - fromy, tox - fromx);
-        var headlen = Math.abs($scope.data.value); // arrow head size
-        // bring the line end back some to account for arrow head.
-        tox = tox - (headlen) * Math.cos(angle);
-        toy = toy - (headlen) * Math.sin(angle);
-        // calculate the points.
-        var points = [{
-          x: fromx, // start point
-          y: fromy
-        }, {
-          x: fromx - (headlen / 4) * Math.cos(angle - Math.PI / 2),
-          y: fromy - (headlen / 4) * Math.sin(angle - Math.PI / 2)
-        }, {
-          x: tox - (headlen / 4) * Math.cos(angle - Math.PI / 2),
-          y: toy - (headlen / 4) * Math.sin(angle - Math.PI / 2)
-        }, {
-          x: tox - (headlen) * Math.cos(angle - Math.PI / 2),
-          y: toy - (headlen) * Math.sin(angle - Math.PI / 2)
-        }, {
-          x: tox + (headlen) * Math.cos(angle), // tip
-          y: toy + (headlen) * Math.sin(angle)
-        }, {
-          x: tox - (headlen) * Math.cos(angle + Math.PI / 2),
-          y: toy - (headlen) * Math.sin(angle + Math.PI / 2)
-        }, {
-          x: tox - (headlen / 4) * Math.cos(angle + Math.PI / 2),
-          y: toy - (headlen / 4) * Math.sin(angle + Math.PI / 2)
-        }, {
-          x: fromx - (headlen / 4) * Math.cos(angle + Math.PI / 2),
-          y: fromy - (headlen / 4) * Math.sin(angle + Math.PI / 2)
-        }, {
-          x: fromx,
-          y: fromy
-        }];
-        var pline = new fabric.Polyline(points, {
-          strokeWidth: Math.abs($scope.data.value),
-          fill: document.getElementById("myColor").value,
-          stroke: document.getElementById("myColor").value,
-          opacity: 1,
-          originX: 'left',
-          originY: 'top',
-          selectable: false
-        });
-        canvas.add(pline);
-        canvas.renderAll();
-      }
-      canvas.on('mouse:down', function() {
-        var pointer = canvas.getPointer(event.e);
-        startX = pointer.x;
-        startY = pointer.y;
+      const LineWithArrow = fabric.util.createClass(fabric.Line, {
+        _getCacheCanvasDimensions() {
+          var dim = this.callSuper('_getCacheCanvasDimensions');
+          dim.width += 100; // found by trial and error
+          dim.height += 100; // found by trial and error
+          return dim;
+        },
+        _render(ctx) {
+          this.callSuper('_render', ctx);
+          ctx.save();
+          const xDiff = this.x2 - this.x1;
+          const yDiff = this.y2 - this.y1;
+          this.callSuper('_render', ctx);
+          ctx.save();
+          const xDif = this.x2 - this.x1;
+          const yDif = this.y2 - this.y1;
+          const angles = Math.atan2(yDif, xDif);
+          ctx.translate((xDiff) / 2, (yDiff) / 2);
+          ctx.rotate(angles);
+          ctx.beginPath();
+          // Move 5px in front of line to start the arrow so it does not have the square line end showing in front (0,0)
+          ctx.moveTo($scope.size(), 0);
+          ctx.lineTo(-$scope.size(), $scope.size());
+          ctx.lineTo(-$scope.size(), -$scope.size());
+          ctx.closePath();
+          ctx.fillStyle = this.stroke;
+          ctx.fill();
+          ctx.restore();
+        }
       });
-      canvas.on('mouse:move', function() {});
-      canvas.on('mouse:up', function() {
-        var pointer = canvas.getPointer(event.e);
-        endX = pointer.x;
-        endY = pointer.y;
-        drawArrow(startX, startY, endX, endY);
+      const drawLineWithArrow = (points) => (new LineWithArrow(points, {
+        strokeWidth: Math.abs($scope.data.value),
+        cornerSize: 20,
+        borderColor: '#E8E8E8',
+        cornerColor: '#44444487',
+        transparentCorners: true,
+        cornerStyle: 'circle', //or rect
+        opacity: $scope.data.valueo,
+        strokeDashArray: $scope.isdashed,
+        stroke: document.getElementById('myColor').value,
+        selectable: false,
+        padding: 20, // hasRotatingPoint: false,
+        cornerSize: 20,
+        borderColor: '#E8E8E8',
+        cornerColor: '#CFCFCF',
+        transparentCorners: true,
+        cornerStyle: 'circle' //or rect
+        //                                hasBorders: false,
+        //                                hasControls: false
+      }));
+      const selectLine = (points) => {
+        return drawLineWithArrow(points);
+      };
+      let line;
+      let isDown;
+      canvas.on('mouse:down', (options) => {
+        isDown = true;
+        const pointer = canvas.getPointer(options.e);
+        const points = [$scope.standard(pointer.x,'x'), $scope.standard(pointer.y,'y'), $scope.standard(pointer.x,'x'), $scope.standard(pointer.y,'y')];
+        line = selectLine(points);
+        canvas.add(line).renderAll();
+      });
+      canvas.on('mouse:move', (options) => {
+        if (!isDown) return;
+        const pointer = canvas.getPointer(options.e);
+        line.set({
+          x2: $scope.standard(pointer.x,'x'),
+          y2: $scope.standard(pointer.y,'y')
+        });
+        canvas.renderAll();
+      });
+      canvas.on('mouse:up', () => {
+        isDown = false;
+        line.setCoords();
+        canvas.renderAll();
       });
     }
     ///// END: DRAW LINE ARROW
@@ -712,14 +907,22 @@ document.addEventListener('deviceready', function() {
       canvas.on('mouse:down', function(o) {
         isDown = true;
         var pointer = canvas.getPointer(o.e);
-        var points = [pointer.x, pointer.y, pointer.x, pointer.y];
+        var points = [$scope.standard(pointer.x, 'x'), $scope.standard(pointer.y, 'y'), $scope.standard(pointer.x, 'x'), $scope.standard(pointer.y, 'y')];
         line = new fabric.Line(points, {
           strokeWidth: Math.abs($scope.data.value),
           fill: document.getElementById("myColor").value,
           stroke: document.getElementById("myColor").value,
-          originX: 'center',
-          originY: 'center',
-          selectable: false
+          originX: 'left',
+          originY: 'top',
+          selectable: false,
+          padding: 20,
+          cornerSize: 20,
+          borderColor: '#E8E8E8',
+          cornerColor: '#44444487',
+          transparentCorners: true,
+          cornerStyle: 'circle', //or rect
+          strokeDashArray: $scope.isdashed,
+          opacity: $scope.data.valueo,
         });
         canvas.add(line);
       });
@@ -727,12 +930,13 @@ document.addEventListener('deviceready', function() {
         if (!isDown) return;
         var pointer = canvas.getPointer(o.e);
         line.set({
-          x2: pointer.x,
-          y2: pointer.y
+          x2: $scope.standard(pointer.x, 'x'),
+          y2: $scope.standard(pointer.y, 'y'),
         });
         canvas.renderAll();
         line.setCoords();
       });
+      canvas.on('mouse:up', function(o) {});
     }
     /// END: DRAW STRAIGHT
     //// BEGIN: DRAWING TEXT
@@ -741,12 +945,20 @@ document.addEventListener('deviceready', function() {
       changeObjectSelection(false);
       $scope.data.draw = false;
       var itext = new fabric.Text('Text', {
+        originX: 'left',
+        originY: 'top',
         left: 100,
         top: 150,
         fill: document.getElementById("myColor").value,
         strokeWidth: 1,
-        fontSize:30,
-        fontFamily: 'Helvetica'
+        fontSize: 30,
+        fontFamily: 'Helvetica',
+        padding: 20,
+        cornerSize: 20,
+        borderColor: '#E8E8E8',
+        cornerColor: '#44444487',
+        transparentCorners: true,
+        cornerStyle: 'circle', //or rect
       });
       canvas.add(itext);
       /*canvas.on('text:editing:entered', function(e) {
@@ -833,10 +1045,12 @@ document.addEventListener('deviceready', function() {
     ////// BEGIN: ADD THE RULER
     canvas.renderAll(); //reset
     $scope.data.zoom = 30; // default zoom
-    $scope.zoomless = 30; // min zoom
+    $scope.zoomless = 15; // min zoom
     $scope.zoommax = 60; // max zoom
-    $scope.ruler = function() {
-      $scope.setzoom = function(intzoom) { /////// ALL CHANGE ZOOM WITH FUNCTION:"setzoom" 
+    $scope.setzoom = function(intzoom) {$scope.ruler(intzoom)}
+    $scope.ruler = function(intzoom) {
+      
+        /////// ALL CHANGE ZOOM WITH FUNCTION:"setzoom" 
         if ($scope.data.ruler) {
           var xobj = {};
           var xtext = {};
@@ -845,11 +1059,17 @@ document.addEventListener('deviceready', function() {
           var ytext = {};
           var xs = [];
           var ys = [];
+          $scope.standardx = [];
+          $scope.standardy = [];
           for (var i = parseInt(intzoom); i <= 500; i += parseInt(intzoom)) {
             ///////////// stripe  AND RULER X
+            var standardcolorx = '#000000';
+            var standardcolory = '#000000';
+            var sizex = 0.1;
+            var sizey = 0.1;
             var text = new fabric.Text(i.toString(), { ///rulerx
               fontFamily: 'Comic Sans',
-              fontSize: 15,
+              fontSize: 1 + $scope.data.zoom / 2,
               width: 1,
               height: 1000,
               left: i - 10,
@@ -860,7 +1080,7 @@ document.addEventListener('deviceready', function() {
             xs.push(xtext);
             var texty = new fabric.Text(i.toString(), { ///rulery
               fontFamily: 'Comic Sans',
-              fontSize: 15,
+              fontSize: 1 + $scope.data.zoom / 2,
               width: 1000,
               height: 1,
               left: 0,
@@ -870,23 +1090,25 @@ document.addEventListener('deviceready', function() {
             ytext = texty;
             xs.push(ytext);
             x = new fabric.Rect({ //// caro line
-              width: 0.1,
+              width: sizex,
               height: 1000,
               left: i,
               top: 15,
-              fill: 'black',
+              fill: standardcolorx,
               selectable: false,
             });
+            $scope.standardx.push(x.left)
             xobj = x;
             xs.push(xobj);
             y = new fabric.Rect({
               width: 1000,
-              height: 0.1,
+              height: sizey,
               left: 15,
               top: i,
-              fill: 'black',
+              fill: standardcolory,
               selectable: false,
             });
+            $scope.standardy.push(y.top)
             yobj = y;
             xs.push(yobj);
           }
@@ -894,10 +1116,12 @@ document.addEventListener('deviceready', function() {
           canvas.setOverlayImage(alltogetherObj);
           canvas.renderAll();
         } else {
+          $scope.standardx = [];
+          $scope.standardy = [];
           canvas.overlayImage = false;
           canvas.renderAll();
         }
-      }
+      
     }
     ////// END: ADD THE RULER
     var objects = canvas.getObjects();
@@ -921,23 +1145,37 @@ document.addEventListener('deviceready', function() {
         point1 = new fabric.Point(pointer.x, pointer.y);
         if (line) {
           console.log(line);
-          line = new fabric.Line([line.get('x2'), line.get('y2'), pointer.x, pointer.y], {
+          line = new fabric.Line([line.get('x2'), line.get('y2'), $scope.standard(pointer.x, 'x'), $scope.standard(pointer.y, 'y')], {
             stroke: document.getElementById("myColor").value,
             lockMovementX: true,
             lockMovementY: true,
             strokeWidth: Math.abs($scope.data.value),
             selectable: false,
-            hoverCursor: 'default'
+            hoverCursor: 'default',
+            cornerSize: 20,
+            borderColor: '#E8E8E8',
+            cornerColor: '#44444487',
+            transparentCorners: true,
+            cornerStyle: 'circle', //or rect
+            strokeDashArray: $scope.isdashed,
+            opacity: $scope.data.valueo,
           });
           canvas.add(line);
         } else {
-          line = new fabric.Line([pointer.x, pointer.y, pointer.x, pointer.y], {
+          line = new fabric.Line([$scope.standard(pointer.x, 'x'), $scope.standard(pointer.y, 'y'), $scope.standard(pointer.x, 'x'), $scope.standard(pointer.y, 'y')], {
             stroke: document.getElementById("myColor").value,
             lockMovementX: true,
-            strokeWidth:  Math.abs($scope.data.value),
+            strokeWidth: Math.abs($scope.data.value),
             lockMovementY: true,
             selectable: false,
-            hoverCursor: 'default'
+            hoverCursor: 'default',
+            cornerSize: 20,
+            borderColor: '#E8E8E8',
+            cornerColor: '#44444487',
+            transparentCorners: true,
+            cornerStyle: 'circle', //or rect
+            strokeDashArray: $scope.isdashed,
+            opacity: $scope.data.valueo,
           });
           canvas.add(line);
         }
@@ -945,46 +1183,135 @@ document.addEventListener('deviceready', function() {
       canvas.on('mouse:move', function(o) {
         var pointer = canvas.getPointer(o.e);
         line.set({
-          x2: pointer.x,
-          y2: pointer.y
+          x2: $scope.standard(pointer.x, 'x'),
+          y2: $scope.standard(pointer.y, 'y')
         });
         canvas.renderAll();
         // console.log(canvas.getObjects().length);
         //console.log(canvas.getObjects().pop());
       });
-         canvas.on('mouse:up', function(o) {
+      canvas.on('mouse:up', function(o) {
         canvas.renderAll();
       });
-
-
     };
     /////END: DRAWING arrow
     /////BEGIN FILL
-    $scope.fill = function() {
+    fill = function() {
       console.log(canvas.getActiveObject());
       if (canvas.getActiveObject()) {
-        canvas.getActiveObject().set("fill", document.getElementById("myColor").value)
+        canvas.getActiveObject().set("fill", document.getElementById("myColorfill").value)
         canvas.renderAll();
-      } else {
-        alert("Choose object pls!")
+        $scope.data.fill = true;
+        $scope.$evalAsync()
       }
     }
     //////END FILL
     ///////BEGIN: SET FILL
-    $scope.sf=false;
-    $scope.setfill = function() {
-      $scope.sf=!$scope.sf;
+    $scope.sf = false;
+    $scope.data.fill = false
+    $scope.setfill = function(values) {
+      var value = !values
+      $scope.sf = value;
+      if (canvas.getActiveObject()) {
+        if (canvas.getActiveObject().id == 'square' || canvas.getActiveObject().id == 'circle') {
+          if (value) {
+            canvas.getActiveObject().set('fill', document.getElementById('myColorfill').value);
+          } else if (!value) {
+            canvas.getActiveObject().set('fill', false);
+          }
+          canvas.renderAll();
+        }
+      }
     }
-    $scope.colorfill=function(value){
-      if(value){
-        return document.getElementById("myColor").value;
-
-      }else{
+    $scope.colorfill = function(value) {
+      if (value) {
+        return document.getElementById("myColorfill").value;
+      } else {
         return false;
       }
     }
     ///////END:SET FILL
+    //////BEGIN: FUNTION() GET STANDARD XY
+    var moving=function(){
+      canvas.on('object:moving', function(event) {
+     
 
+      for (let i in $scope.standardx) {
+        if (event.target.left >= $scope.standardx[i] - $scope.data.zoom / 2 && event.target.left < $scope.standardx[i] + $scope.data.zoom / 2) {
+          event.target.left = $scope.standardx[i];
+          canvas.renderAll();
+        }
+      }
+      for (let i in $scope.standardy) {
+        if (event.target.top >= $scope.standardy[i] - $scope.data.zoom / 2 && event.target.top < $scope.standardy[i] + $scope.data.zoom / 2) {
+          event.target.top = $scope.standardy[i];
+          canvas.renderAll();
+        }
+      }
+    });
+    }
+     var unmoving=function(){
+      canvas.off('object:moving');
+    }
+    $scope.autosnap=function(issnap){
+     $scope.data.autosnap=!issnap;
+        if($scope.data.autosnap){
+
+        
+    moving();
+    $scope.standard = function(value, xy) {
+      if (xy == 'x') {
+        for (let i in $scope.standardx) {
+          if (value >= $scope.standardx[i] - $scope.data.zoom / 2 && value < $scope.standardx[i] + $scope.data.zoom / 2) {
+            value = $scope.standardx[i];
+          }
+        }
+        return value;
+      }
+      if (xy == 'y') {
+        for (let i in $scope.standardy) {
+          if (value >= $scope.standardy[i] - $scope.data.zoom / 2 && value < $scope.standardy[i] + $scope.data.zoom / 2) {
+            value = $scope.standardy[i];
+          }
+        }
+        return value;
+      }
+    }
+        } else {
+
+          unmoving();
+          $scope.standard = function(value, xy) {
+      if (xy == 'x') {
+       
+        return value;
+      }
+      if (xy == 'y') {
+      
+        return value;
+      }
+    }
+        
+
+    
+    }
+    }
+    $scope.standard = function(value, xy) {
+      if (xy == 'x') {
+       
+        return value;
+      }
+      if (xy == 'y') {
+      
+        return value;
+      }
+    }
+   
+  
+    //////END: FUNTION() GET STANDARD XY
+    $scope.rangeruler=false;
+    $scope.showrangeruler=function(){
+        $scope.rangeruler=!$scope.rangeruler;
+    }
     //////BEGIN: DRAW SQUARE
     function drawSquare() {
       canvas.discardActiveObject();
@@ -994,24 +1321,29 @@ document.addEventListener('deviceready', function() {
       var square, isDown, origX, origY;
       canvas.on('mouse:down', function(o) {
         $scope.reset = true;
-        var colors = document.getElementById("myColor").value;
         isDown = true;
         var pointer = canvas.getPointer(o.e);
-        origX = pointer.x;
-        origY = pointer.y;
+        origX = $scope.standard(pointer.x, 'x');
+        origY = $scope.standard(pointer.y, 'y');
         square = new fabric.Rect({
+          id: 'square',
           left: origX,
           top: origY,
           originX: 'left',
           originY: 'top',
-          width: pointer.x - origX,
-          height: pointer.y - origY,
-          angle: 0,
+          padding: 20,
           strokeWidth: Math.abs($scope.data.value),
           fill: $scope.colorfill($scope.sf),
-          stroke: colors,
+          stroke: document.getElementById("myColor").value,
           selectable: false,
-          hasRotatingPoint: false
+          hasRotatingPoint: false,
+          cornerSize: 20,
+          borderColor: '#E8E8E8',
+          cornerColor: '#44444487',
+          transparentCorners: true,
+          cornerStyle: 'circle', //or rect
+          opacity: $scope.data.valueo,
+          strokeDashArray: $scope.isdashed,
         });
         canvas.add(square);
       });
@@ -1020,25 +1352,26 @@ document.addEventListener('deviceready', function() {
         var pointer = canvas.getPointer(o.e);
         if (origX > pointer.x) {
           square.set({
-            left: Math.abs(pointer.x)
+            left: $scope.standard(pointer.x, 'x')
           });
         }
         if (origY > pointer.y) {
           square.set({
-            top: Math.abs(pointer.y)
+            top: $scope.standard(pointer.y, 'y')
           });
         }
         square.set({
-          width: Math.abs(origX - pointer.x)
+          width: Math.abs(origX - $scope.standard(pointer.x, 'x'))
         });
         square.set({
-          height: Math.abs(origY - pointer.y)
+          height: Math.abs(origY - $scope.standard(pointer.y, 'y'))
         });
         canvas.renderAll();
       });
       canvas.on('mouse:up', function(o) {
         isDown = false;
-        square.setCoords(); // WHEN CLICK OFF  'circle.setCoords()'  with set the location correct when the current RECT just make
+        square.setCoords();
+        // WHEN CLICK OFF  'circle.setCoords()'  with set the location correct when the current RECT just make
       });
     }
     //////END: DRAW SQUARE
@@ -1050,29 +1383,38 @@ document.addEventListener('deviceready', function() {
       canvas.on('mouse:down', function(o) {
         isDown = true;
         var pointer = canvas.getPointer(o.e);
-        origX = pointer.x;
-        origY = pointer.y;
+        origX = $scope.standard(pointer.x, 'x')
+        origY = $scope.standard(pointer.y, 'y')
         ellipse = new fabric.Ellipse({
+          id: 'circle',
           left: origX,
           top: origY,
           originX: 'left',
           originY: 'top',
-          rx: pointer.x - origX,
-          ry: pointer.y - origY,
+          padding: 20,
+          rx: $scope.standard(pointer.x, 'x') - origX,
+          ry: $scope.standard(pointer.y, 'y') - origY,
           angle: 0,
           stroke: document.getElementById("myColor").value,
           strokeWidth: Math.abs($scope.data.value),
           fill: $scope.colorfill($scope.sf),
           selectable: false,
-          hasRotatingPoint: false
+          hasRotatingPoint: false,
+          cornerSize: 20,
+          borderColor: '#E8E8E8',
+          cornerColor: '#44444487',
+          transparentCorners: true,
+          cornerStyle: 'circle', //or rect
+          strokeDashArray: $scope.isdashed,
+          opacity: $scope.data.valueo,
         });
         canvas.add(ellipse);
       });
       canvas.on('mouse:move', function(o) {
         if (!isDown) return;
         var pointer = canvas.getPointer(o.e);
-        var rx = Math.abs(origX - pointer.x) / 2;
-        var ry = Math.abs(origY - pointer.y) / 2;
+        var rx = Math.abs(origX - $scope.standard(pointer.x, 'x')) / 2;
+        var ry = Math.abs(origY - $scope.standard(pointer.y, 'y')) / 2;
         if (rx > ellipse.strokeWidth) {
           rx -= ellipse.strokeWidth / 2;
         }
@@ -1125,161 +1467,124 @@ document.addEventListener('deviceready', function() {
         canvas.add(h.pop());
       }
     };
-
-////END: BACKWARD
-/////BEGIN: DELETE BG
-$scope.deletebg=function(){
-  if (canvas.getObjects('image')[0]) {
-     h.push(canvas.getObjects('image')[0]);
-    canvas.remove(canvas.getObjects('image')[0]); 
-    console.log(canvas.getObjects('image'));
-    canvas.renderAll();
-  }else{
-    alert("The canvas background is clean now!")
-  }
-
-}
-/////END: DELETE BG
-
+    ////END: BACKWARD
+    /////BEGIN: DELETE BG
+    $scope.deletebg = function() {
+      for (let i in canvas.getObjects('image'))
+        if (canvas.getObjects('image')[i].get('id') == 'background') {
+          h.push(canvas.getObjects('image')[i]);
+          canvas.remove(canvas.getObjects('image')[i]);
+          console.log(canvas.getObjects('image'));
+          canvas.renderAll();
+        } else {
+          alert("The canvas background is clean now!")
+        }
+    }
+    /////END: DELETE BG
     //// BEGIN: ZOOM CANVAS
-    var canvasScale = 1; var SCALE_FACTOR = 1.2;
-    $scope.Zoomin = function () {
-                canvasScale = canvasScale * SCALE_FACTOR;
-
-                canvas.setHeight(canvas.getHeight() * SCALE_FACTOR);
-                canvas.setWidth(canvas.getWidth() * SCALE_FACTOR);
-
-                var objects = canvas.getObjects();
-                for (var i in objects) {
-                    var scaleX = objects[i].scaleX;
-                    var scaleY = objects[i].scaleY;
-                    var left = objects[i].left;
-                    var top = objects[i].top;
-
-                    var tempScaleX = scaleX * SCALE_FACTOR;
-                    var tempScaleY = scaleY * SCALE_FACTOR;
-                    var tempLeft = left * SCALE_FACTOR;
-                    var tempTop = top * SCALE_FACTOR;
-
-                    objects[i].scaleX = tempScaleX;
-                    objects[i].scaleY = tempScaleY;
-                    objects[i].left = tempLeft;
-                    objects[i].top = tempTop;
-
-                    objects[i].setCoords();
-                }
-
-                canvas.renderAll();
-            };
-            $scope.Zoomout = function () {
-                canvasScale = canvasScale / SCALE_FACTOR;
-                canvas.setHeight(canvas.getHeight() * (1 / SCALE_FACTOR));
-                canvas.setWidth(canvas.getWidth() * (1 / SCALE_FACTOR));
-
-                var objects = canvas.getObjects();
-                for (var i in objects) {
-                    var scaleX = objects[i].scaleX;
-                    var scaleY = objects[i].scaleY;
-                    var left = objects[i].left;
-                    var top = objects[i].top;
-
-                    var tempScaleX = scaleX * (1 / SCALE_FACTOR);
-                    var tempScaleY = scaleY * (1 / SCALE_FACTOR);
-                    var tempLeft = left * (1 / SCALE_FACTOR);
-                    var tempTop = top * (1 / SCALE_FACTOR);
-
-                    objects[i].scaleX = tempScaleX;
-                    objects[i].scaleY = tempScaleY;
-                    objects[i].left = tempLeft;
-                    objects[i].top = tempTop;
-
-                    objects[i].setCoords();
-                }
-
-                canvas.renderAll();
-            };
-            $scope.ResetZoom = function () {
-                canvas.setHeight(canvas.getHeight() * (1 / canvasScale));
-                canvas.setWidth(canvas.getWidth() * (1 / canvasScale));
-
-                var objects = canvas.getObjects();
-                for (var i in objects) {
-                    var scaleX = objects[i].scaleX;
-                    var scaleY = objects[i].scaleY;
-                    var left = objects[i].left;
-                    var top = objects[i].top;
-
-                    var tempScaleX = scaleX * (1 / canvasScale);
-                    var tempScaleY = scaleY * (1 / canvasScale);
-                    var tempLeft = left * (1 / canvasScale);
-                    var tempTop = top * (1 / canvasScale);
-
-                    objects[i].scaleX = tempScaleX;
-                    objects[i].scaleY = tempScaleY;
-                    objects[i].left = tempLeft;
-                    objects[i].top = tempTop;
-
-                    objects[i].setCoords();
-                }
-
-                canvas.renderAll();
-
-                canvasScale = 1;
-            };
+    var canvasScale = 1;
+    var SCALE_FACTOR = 1.2;
+    $scope.Zoomin = function() {
+      canvasScale = canvasScale * SCALE_FACTOR;
+      canvas.setHeight(canvas.getHeight() * SCALE_FACTOR);
+      canvas.setWidth(canvas.getWidth() * SCALE_FACTOR);
+      var objects = canvas.getObjects();
+      for (var i in objects) {
+        var scaleX = objects[i].scaleX;
+        var scaleY = objects[i].scaleY;
+        var left = objects[i].left;
+        var top = objects[i].top;
+        var tempScaleX = scaleX * SCALE_FACTOR;
+        var tempScaleY = scaleY * SCALE_FACTOR;
+        var tempLeft = left * SCALE_FACTOR;
+        var tempTop = top * SCALE_FACTOR;
+        objects[i].scaleX = tempScaleX;
+        objects[i].scaleY = tempScaleY;
+        objects[i].left = tempLeft;
+        objects[i].top = tempTop;
+        objects[i].setCoords();
+      }
+      canvas.renderAll();
+    };
+    $scope.Zoomout = function() {
+      canvasScale = canvasScale / SCALE_FACTOR;
+      canvas.setHeight(canvas.getHeight() * (1 / SCALE_FACTOR));
+      canvas.setWidth(canvas.getWidth() * (1 / SCALE_FACTOR));
+      var objects = canvas.getObjects();
+      for (var i in objects) {
+        var scaleX = objects[i].scaleX;
+        var scaleY = objects[i].scaleY;
+        var left = objects[i].left;
+        var top = objects[i].top;
+        var tempScaleX = scaleX * (1 / SCALE_FACTOR);
+        var tempScaleY = scaleY * (1 / SCALE_FACTOR);
+        var tempLeft = left * (1 / SCALE_FACTOR);
+        var tempTop = top * (1 / SCALE_FACTOR);
+        objects[i].scaleX = tempScaleX;
+        objects[i].scaleY = tempScaleY;
+        objects[i].left = tempLeft;
+        objects[i].top = tempTop;
+        objects[i].setCoords();
+      }
+      canvas.renderAll();
+    };
+    $scope.ResetZoom = function() {
+      canvas.setHeight(canvas.getHeight() * (1 / canvasScale));
+      canvas.setWidth(canvas.getWidth() * (1 / canvasScale));
+      var objects = canvas.getObjects();
+      for (var i in objects) {
+        var scaleX = objects[i].scaleX;
+        var scaleY = objects[i].scaleY;
+        var left = objects[i].left;
+        var top = objects[i].top;
+        var tempScaleX = scaleX * (1 / canvasScale);
+        var tempScaleY = scaleY * (1 / canvasScale);
+        var tempLeft = left * (1 / canvasScale);
+        var tempTop = top * (1 / canvasScale);
+        objects[i].scaleX = tempScaleX;
+        objects[i].scaleY = tempScaleY;
+        objects[i].left = tempLeft;
+        objects[i].top = tempTop;
+        objects[i].setCoords();
+      }
+      canvas.renderAll();
+      canvasScale = 1;
+    };
     ///// END: ZOOM CANVAS
-
-
-
-
-
     /// SAVE IMAGE
-
     $scope.saveImg = function() {
-  $ionicLoading.show();
+      $ionicLoading.show();
       if (!fabric.Canvas.supports('toDataURL')) {
         alert('This browser doesn\'t provide means to serialize canvas to an image');
-
       } else {
-          $timeout(function () {
-        canvas.overlayImage = false;
-        $scope.data.ruler = false;
-        canvas.renderAll();
-        for(var i=0;i<3;i++){
-          $scope.Zoomin();
-        }  
-        console.log(canvas.toDataURL('image/jpeg'));
-        
-        document.addEventListener('deviceready', function() {
-        
-          var params = {
-            data: canvas.toDataURL('jpg'),
-            prefix: 'myPrefix_',
-            format: 'JPG',
-            quality: 100,
-            mediaScanner: true
-          };
-          window.imageSaver.saveBase64Image(params, function(filePath) {
-            
-            console.log('File saved on ' + filePath);
-          
-            
-            alert("success save file:" + filePath);
-             
-          }, function(msg) {
-            
-            console.error(msg);
-          });
+        $timeout(function() {
+          canvas.overlayImage = false;
+          $scope.data.ruler = false;
+          canvas.renderAll();
+          for (var i = 0; i < 3; i++) {
+            $scope.Zoomin();
+          }
+          console.log(canvas.toDataURL('image/jpeg'));
+          document.addEventListener('deviceready', function() {
+            var params = {
+              data: canvas.toDataURL('jpg'),
+              prefix: 'myPrefix_',
+              format: 'JPG',
+              quality: 100,
+              mediaScanner: true
+            };
+            window.imageSaver.saveBase64Image(params, function(filePath) {
+              console.log('File saved on ' + filePath);
+              alert("success save file:" + filePath);
+            }, function(msg) {
+              console.error(msg);
+            });
             $scope.ResetZoom();
-           
-
-        });
-
+          });
           $scope.ResetZoom();
-           $ionicLoading.hide()
-        },100);
-
+          $ionicLoading.hide()
+        }, 100);
       }
-
     }
     /// SAVE IMAGE
     ////SAVE JSON AS TEXT
@@ -1311,7 +1616,9 @@ $scope.deletebg=function(){
         allObjects = canvas.getObjects('image');
         allObjects.selectable = false;
         for (let i in allObjects) {
-          allObjects[i].selectable = false;
+          if (allObjects[i].get('id') == 'background') {
+            allObjects[i].selectable = false;
+          }
         }
       });
       removeEvents();
@@ -1321,10 +1628,9 @@ $scope.deletebg=function(){
     ///LOAD JSON
     ///DELETE 
     $scope.clear = function() {
-      for (var i = 0; i <= canvas.getActiveObjects().length; i++) {
-        h.push(canvas.getActiveObjects()[i]);
-        canvas.remove(canvas.getActiveObjects()[i]);
-      }
+      h.push(canvas.getActiveObject());
+      canvas.remove(canvas.getActiveObject());
+      canvas.renderAll();
     }
     $scope.delete = function() {
       canvas.clear();
@@ -1397,7 +1703,7 @@ $scope.deletebg=function(){
               a: content
             });
           });
-            element.children('input[file]').val(null);
+          element.children('input[file]').val(null);
         });
         element.on('click', function() {
           fileInput[0].click();
@@ -1416,7 +1722,6 @@ $scope.deletebg=function(){
         var content = ev.target.result;
         deferred.resolve(content);
       };
-
       reader.readAsDataURL(file);
       return deferred.promise;
     };
@@ -1442,7 +1747,7 @@ $scope.deletebg=function(){
         var fileInput = element.children('input[file]');
         fileInput.on('change', function(event) {
           var file = event.target.files[0];
-           console.log(file);
+          console.log(file);
           readFilebg(file).then(function(content) {
             $rootScope.$broadcast("uploadbg", {
               a: content
@@ -1455,5 +1760,30 @@ $scope.deletebg=function(){
         });
       }
     };
+  })
+  /////////////UPLOAD IMAGE BG
+  /////////////UPLOAD IMAGE BG
+  .directive('image', function(readFilebg, $rootScope) {
+    'use strict';
+    return {
+      template: '<input  type="file" accept="image/*" style="display: none;" />' + '<ng-transclude></ng-transclude>',
+      transclude: true,
+      link: function(scope, element) {
+        var fileInput = element.children('input[file]');
+        fileInput.on('change', function(event) {
+          var file = event.target.files[0];
+          console.log(file);
+          readFilebg(file).then(function(content) {
+            $rootScope.$broadcast("images", {
+              a: content
+            });
+          });
+          element.children('input[file]').val(null);
+        });
+        element.on('click', function() {
+          fileInput[0].click();
+        });
+      }
+    };
   });
-/////////////UPLOAD IMAGE BEGIN
+/////////////UPLOAD IMAGE BG
