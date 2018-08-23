@@ -234,6 +234,18 @@ div.maxopanlevel{
     } 
 .opacitylevel:active+ .b {background-color: blue;height: 100px} 
 */
+.sizebrush{
+     display: block;
+     background-color: red;
+     position: absolute;
+    width: 20px;
+    height: 20px;
+    top: auto;
+    left: 275px;
+     border-radius: 100%;
+     border-color: white;
+     border-style: dotted;
+}
 .maxsizebrush{
      display: block;
      background-color: transparent;
@@ -318,8 +330,8 @@ div.maxopanlevel{
     position: absolute;
     width: 9px;
     height: 9px;
-    bottom:0;
-    right:0;
+    bottom:0px;
+    right:0px;
     border-radius: 100%;
     background-color: black;
 
@@ -475,8 +487,8 @@ div.maxopanlevel{
 }
 .opacitylevel {
     position: absolute;
-    display: block;
-    margin-top: 10px;
+    margin-top: 35px;
+    height: 30px;
     top:465px; 
    
 }

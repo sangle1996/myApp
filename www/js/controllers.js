@@ -970,7 +970,10 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         transparentCorners: true,
         cornerStyle: 'circle', //or rect
       });
-      canvas.add(itext);
+      canvas.add(itext).setActiveObject(itext);
+      $scope.showitext=true;
+        $scope.data.text = itext.get('text');
+
       /*canvas.on('text:editing:entered', function(e) {
 
         $scope.showitext = true;
@@ -1063,9 +1066,9 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         /////// ALL CHANGE ZOOM WITH FUNCTION:"setzoom" 
         if ($scope.data.ruler) {
           var xobj = {};
-          var xtext = {};
+         // var xtext = {};
           var yobj = {};
-          var ytext = {};
+        //  var ytext = {};
           var ytext = {};
           var xs = [];
           var ys = [];
@@ -1073,18 +1076,15 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           $scope.standardy = [];
           for (var i = parseInt(intzoom); i <= 500; i += parseInt(intzoom)) {
             ///////////// stripe  AND RULER X
-            var standardcolorx = '#000000';
-            var standardcolory = '#000000';
-            var sizex = 0.1;
-            var sizey = 0.1;
-            var text = new fabric.Text(i.toString(), { ///rulerx
+           
+         
+            /*var text = new fabric.Text(i.toString(), { ///rulerx
               fontFamily: 'Comic Sans',
               fontSize: 1 + $scope.data.zoom / 2,
               width: 1,
               height: 1000,
               left: i - 10,
               top: 0,
-              selectable: false
             });
             xtext = text;
             xs.push(xtext);
@@ -1095,28 +1095,25 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
               height: 1,
               left: 0,
               top: i - 10,
-              selectable: false
             });
             ytext = texty;
-            xs.push(ytext);
+            xs.push(ytext);*/
             x = new fabric.Rect({ //// caro line
-              width: sizex,
+              width: 0.5,
               height: 1000,
               left: i,
-              top: 15,
-              fill: standardcolorx,
-              selectable: false,
+              top: 0,
+              fill: 'rgba(0, 0, 0, 0.25)',
             });
             $scope.standardx.push(x.left)
             xobj = x;
             xs.push(xobj);
             y = new fabric.Rect({
               width: 1000,
-              height: sizey,
-              left: 15,
+              height: 0.5,
+              left: 0,
               top: i,
-              fill: standardcolory,
-              selectable: false,
+              fill: 'rgba(0, 0, 0, 0.25)',
             });
             $scope.standardy.push(y.top)
             yobj = y;
@@ -1129,6 +1126,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           $scope.standardx = [];
           $scope.standardy = [];
           canvas.overlayImage = false;
+          $scope.data.rangeruler=false;
           canvas.renderAll();
         }
       
@@ -1318,10 +1316,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
    
   
     //////END: FUNTION() GET STANDARD XY
-    $scope.rangeruler=false;
-    $scope.showrangeruler=function(){
-        $scope.rangeruler=!$scope.rangeruler;
-    }
+  
     //////BEGIN: DRAW SQUARE
     function drawSquare() {
       canvas.discardActiveObject();
