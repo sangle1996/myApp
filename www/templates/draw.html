@@ -2,7 +2,7 @@
   <ion-header-bar class="headerbar" style="background-color: #111;">
     <button ng-click="Undo()" class="button button-positive button-icon icon ion-reply "></button>
       <button ng-click="Redo()"  class="button button-positive button-icon icon ion-forward "></button>
-     <button ng-click="Pass()" style="text-align:left;" class="button button-positive button-icon icon ion-document "></button>
+     <button ng-click="Pass()" style="text-align:left; color: green" class="button button-positive button-icon icon ion-document "></button>
 
      <div class="range"  >
       <input style="margin-left:-5px" ng-style="stylecolor" type="range"  ng-change="setlevel(data.value)" ng-model="data.value" min="{{min}}" max="{{max}}">
@@ -95,10 +95,20 @@
       </div>
 
     </div>
-      <div class="range opacitylevel"><div class="note" style="top:15px">Opacity</div>
-      <input type="range"  ng-change="setlevelo(data.valueo)" style="margin-top: 11px;" ng-model="data.valueo" min="0" max="1" step="0.1">
-      <div  class="opanlevel" ng-style="opanlevel" style="top:25px"></div><div  class="maxopanlevel" style="top:25px"></div>
+    <!--opan city -->
+
+
+      
+      <div class="range opacitylevel ">
+       
+      <input type="range"  ng-change="setlevelo(data.valueo)" style="margin-top: 11px ; display: inline-block;
+    background:linear-gradient(to right, red {{data.valueo*100 }}%, rgb(204, 204, 204) 0%) center center / 95% 2px no-repeat;
+    background-size: 90% 2px;" ng-model="data.valueo" min="0" max="1" step="0.1">
+      <div  class="opanlevel " ng-style="opanlevel" style="top:25px"></div><div  class="maxopanlevel" style="top:25px"></div>
     </div>
+
+     
+    <!--opan city -->
     <div class="row edit" style="height: 53px;">
       <a class="button button-icon icon ion-trash-a col"  ng-click="clear()"><div class="note" style="top:23px;left: 20px">Delete</div></a>
       <!-- <a class="button button-outline button-balanced" ng-click="saveImg()">save</br>img</a> -->
@@ -195,7 +205,7 @@
       <input ng-style="stylecolor" type="range"  ng-change="setlevel(data.value)" ng-model="data.value" min="{{min}}" max="{{max}}">
     </div>  
 
-      <div ng-if="data.ruler" ng-click="showrangeruler()" style="position: absolute;left:0px;top: 310px;width: 30px;height: 30px; background-color: rgba(204, 204, 204, 0.49) ;border-radius: 30% ">
+      <div ng-if="data.ruler" ng-click="showrangeruler();rangeruler=false" style="position: absolute;left:0px;top: 310px;width: 30px;height: 30px; background-color: rgba(204, 204, 204, 0.49) ;border-radius: 30% ">
         <img class="imgshape" src="../img/zoom.png" >
   
     </div>

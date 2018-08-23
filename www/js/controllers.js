@@ -386,7 +386,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
             $scope.data.text = e.target.get('text');
             $scope.$evalAsync();
           } else {
-            if (e.target.get('id') != "img" && e.target.get('id') != "background" ) {
+            if (e.target.get('id') != "img" ) {
             $scope.showitext = false;
             if (window.angular.isString(e.target.get('fill'))) {
               $scope.data.fill = true;
@@ -494,55 +494,42 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     };
     /////  CHANGE COLOR BRUSH
     //////// BEGIN: CLEAN-BACKGROUND
-    var cleanbackground = function() {
-      for (let i in canvas.getObjects()) {
-        if (canvas.getObjects()[i].get('id') == 'background') {
-          canvas.remove(canvas.getObjects('image')[i]);
-        }
-      }
-    }
+
     /////// END: CLEAN-BACKGROUND
     /////// BEGIN: SET BACKGROUND
-    $scope.background;
+
     var copbg = $rootScope.$on("uploadbg", function(event, opt) {
-      cleanbackground();
       fabric.Image.fromURL(opt.a, function(img) {
         // add background image
-        $scope.background = img;
+       
         var center = canvas.getCenter(); ///get center value
         if (img.width < img.height) { //////// check size to fit image
           img1 = img.set({
-            id: 'background',
             scaleX: canvas.width / (img.width + (img.height - (canvas.height + (img.width - canvas.width)))),
             scaleY: canvas.height / img.height,
             top: center.top,
             left: center.left,
             originX: 'center',
             originY: 'center',
-            selectable: false,
           });
-          canvas.add(img1);
+          
         }
         if (img.width >= img.height) {
           img1 = img.set({
-            id: 'background',
             scaleX: canvas.width / img.width,
             scaleY: canvas.height / (img.height + (img.width - (canvas.width + (img.height - canvas.height)))),
             top: center.top,
             left: center.left,
             originX: 'center',
             originY: 'center',
-            selectable: false,
           });
-          canvas.add(img1);
+          
         }
-        for (let i in canvas.getObjects('image')) //// send to back when created
-        {
-          if (canvas.getObjects('image')[i].get('id') == 'background') {
-            canvas.sendToBack(canvas.getObjects('image')[i]);
-          }
-        }
+
+       canvas.setBackgroundImage(img1);
+       canvas.renderAll();
       });
+
     });
     $scope.$on('$destroy', function() {
       copbg();
@@ -559,8 +546,8 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
             id: 'img',
             scaleX: canvas.width / (img.width + (img.height - (canvas.height + (img.width - canvas.width)))) - 0.1,
             scaleY: canvas.height / img.height - 0.1,
-            top: center.top,
-            left: center.left,
+           top: center.top/2,
+            left: center.left/2,
             originX: 'left',
             originY: 'top',
             padding: 20,
@@ -577,11 +564,11 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
             id: 'img',
             scaleX: canvas.width / img.width - 0.1,
             scaleY: canvas.height / (img.height + (img.width - (canvas.width + (img.height - canvas.height)))) - 0.1,
-            top: center.top,
-            left: center.left,
+            top: center.top/2,
+            left: center.left/2,
             originX: 'left',
             originY: 'top',
-             padding: 20,
+            padding: 20,
             cornerSize: 20,
             borderColor: '#E8E8E8',
             cornerColor: '#44444487',
@@ -603,7 +590,11 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         canvas.getActiveObject().set('opacity', value);
         canvas.renderAll();
       }
-      $scope.opanlevel = {
+      
+       console.log(canvas.freeDrawingBrush);
+      canvas.requestRenderAll();
+
+      $scope.opanlevel = {    /* CSS */
         'opacity': value
       };
     }
@@ -708,6 +699,22 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     $scope.size = function() {
       return ($scope.data.value > 5) ? $scope.data.value : 5;
     }
+
+    /* Hexto RBG 
+   function hexToRgbA(hex){
+    var c;
+    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+        c= hex.substring(1).split('');
+        if(c.length== 3){
+            c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+        }
+        c= '0x'+c.join('');
+        return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+','+$scope.data.valueo+')';
+    }
+    throw new Error('Bad Hex');
+}
+
+     Hexto RBG */
     /// BEGIN: DRAWING LINE
     var drawingLine = function() {
       canvas.discardActiveObject();
@@ -716,6 +723,9 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       canvas.selection = false;
       canvas.isDrawingMode = true;
       canvas.freeDrawingBrush.color = document.getElementById("myColor").value;
+
+      console.log(canvas.freeDrawingBrush);
+    
       canvas.on('mouse:down', function(o) {
         canvas.freeDrawingBrush.color = document.getElementById("myColor").value;
       });
@@ -1470,16 +1480,10 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     ////END: BACKWARD
     /////BEGIN: DELETE BG
     $scope.deletebg = function() {
-      for (let i in canvas.getObjects('image'))
-        if (canvas.getObjects('image')[i].get('id') == 'background') {
-          h.push(canvas.getObjects('image')[i]);
-          canvas.remove(canvas.getObjects('image')[i]);
-          console.log(canvas.getObjects('image'));
-          canvas.renderAll();
-        } else {
-          alert("The canvas background is clean now!")
-        }
-    }
+     console.log(canvas.backgroundImage);
+     canvas.backgroundImage=false;
+     canvas.renderAll();
+           }
     /////END: DELETE BG
     //// BEGIN: ZOOM CANVAS
     var canvasScale = 1;
@@ -1488,6 +1492,12 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       canvasScale = canvasScale * SCALE_FACTOR;
       canvas.setHeight(canvas.getHeight() * SCALE_FACTOR);
       canvas.setWidth(canvas.getWidth() * SCALE_FACTOR);
+        canvas.backgroundImage.scaleX = canvas.backgroundImage.scaleX * SCALE_FACTOR;
+        canvas.backgroundImage.scaleY =  canvas.backgroundImage.scaleY * SCALE_FACTOR;
+        canvas.backgroundImage.left = canvas.backgroundImage.left* SCALE_FACTOR;
+        canvas.backgroundImage.top =  canvas.backgroundImage.top* SCALE_FACTOR;
+           
+
       var objects = canvas.getObjects();
       for (var i in objects) {
         var scaleX = objects[i].scaleX;
@@ -1531,6 +1541,10 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     $scope.ResetZoom = function() {
       canvas.setHeight(canvas.getHeight() * (1 / canvasScale));
       canvas.setWidth(canvas.getWidth() * (1 / canvasScale));
+        canvas.backgroundImage.scaleX = canvas.backgroundImage.scaleX * (1 / canvasScale);
+        canvas.backgroundImage.scaleY =  canvas.backgroundImage.scaleY * (1 / canvasScale);
+        canvas.backgroundImage.left = canvas.backgroundImage.left* (1 / canvasScale);
+        canvas.backgroundImage.top =  canvas.backgroundImage.top* (1 / canvasScale);
       var objects = canvas.getObjects();
       for (var i in objects) {
         var scaleX = objects[i].scaleX;
@@ -1563,6 +1577,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           canvas.renderAll();
           for (var i = 0; i < 3; i++) {
             $scope.Zoomin();
+          
           }
           console.log(canvas.toDataURL('image/jpeg'));
           document.addEventListener('deviceready', function() {
@@ -1610,16 +1625,20 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     ////SAVE JSON AS TEXT
     ///LOAD JSON
     $scope.loadJson = function(obj) {
-      var allObjects = [];
       $scope.data.ruler = 0;
       canvas.loadFromDatalessJSON(obj, function() {
-        allObjects = canvas.getObjects('image');
-        allObjects.selectable = false;
-        for (let i in allObjects) {
-          if (allObjects[i].get('id') == 'background') {
-            allObjects[i].selectable = false;
-          }
+        for(let i in canvas.getObjects()){
+          canvas.getObjects()[i].set('cornerSize', 20);
+           canvas.getObjects()[i].set('borderColor', '#E8E8E8');
+            canvas.getObjects()[i].set('cornerColor', '#44444487');
+             canvas.getObjects()[i].set('transparentCorners', true);
+              canvas.getObjects()[i].set('cornerStyle', 'circle');
+               canvas.getObjects()[i].set('cornerSize', 20);
+               canvas.getObjects()[i].set('padding', 20); 
+        
+
         }
+            
       });
       removeEvents();
       canvas.renderAll();

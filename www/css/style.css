@@ -221,18 +221,19 @@ div.maxopanlevel{
     }
      
 }
-.sizebrush{
-     display: block;
+/*
+.b{
+    position: absolute;
+     top: 10px;
+     height: 10px;
+     width: 10px;
      background-color: red;
-     position: absolute;
-     top: auto;
-     left: 275px;
-     width: 1px;
-     height: 1px;
-     border-radius: 100%;
-     border-color: white;
-     border-style: dotted;
-}
+    transition: height .4s ease-in-out;
+    -webkit-transition: height .4s ease-in-out;
+    -moz-transition: height .4s ease-in-out;
+    } 
+.opacitylevel:active+ .b {background-color: blue;height: 100px} 
+*/
 .maxsizebrush{
      display: block;
      background-color: transparent;
@@ -282,7 +283,7 @@ div.maxopanlevel{
 
 }
 .edit{
-    margin-top: 20px;
+    margin-top: 40px;
 
 }
 
@@ -475,6 +476,7 @@ div.maxopanlevel{
 .opacitylevel {
     position: absolute;
     display: block;
+    margin-top: 10px;
     top:465px; 
    
 }
