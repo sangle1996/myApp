@@ -234,6 +234,17 @@ div.maxopanlevel{
     } 
 .opacitylevel:active+ .b {background-color: blue;height: 100px} 
 */
+.quality{
+  display: block;
+    position: absolute;
+    width: 50px;
+    height: 140px;
+    top: 410px;
+    left: 225px;
+    background-color: rgba(17, 17, 17, 0.09);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
 .sizebrush{
      display: block;
      background-color: red;

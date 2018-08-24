@@ -383,7 +383,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         if (e.target) {
           if (e.target.get('type') === "text") {
             $scope.showitext = true;
-            $scope.data.text = e.target.get('text');
+            $scope.data.text = e.target.get('text')=='Text'?'':e.target.get('text');
             $scope.$evalAsync();
           } else {
             if (e.target.get('id') != "img" ) {
@@ -972,7 +972,6 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       });
       canvas.add(itext).setActiveObject(itext);
       $scope.showitext=true;
-        $scope.data.text = itext.get('text');
 
       /*canvas.on('text:editing:entered', function(e) {
 
@@ -1487,10 +1486,13 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       canvasScale = canvasScale * SCALE_FACTOR;
       canvas.setHeight(canvas.getHeight() * SCALE_FACTOR);
       canvas.setWidth(canvas.getWidth() * SCALE_FACTOR);
+      if(canvas.backgroundImage){
         canvas.backgroundImage.scaleX = canvas.backgroundImage.scaleX * SCALE_FACTOR;
         canvas.backgroundImage.scaleY =  canvas.backgroundImage.scaleY * SCALE_FACTOR;
         canvas.backgroundImage.left = canvas.backgroundImage.left* SCALE_FACTOR;
         canvas.backgroundImage.top =  canvas.backgroundImage.top* SCALE_FACTOR;
+      }
+        
            
 
       var objects = canvas.getObjects();
@@ -1536,10 +1538,12 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     $scope.ResetZoom = function() {
       canvas.setHeight(canvas.getHeight() * (1 / canvasScale));
       canvas.setWidth(canvas.getWidth() * (1 / canvasScale));
+      if(canvas.backgroundImage){
         canvas.backgroundImage.scaleX = canvas.backgroundImage.scaleX * (1 / canvasScale);
         canvas.backgroundImage.scaleY =  canvas.backgroundImage.scaleY * (1 / canvasScale);
         canvas.backgroundImage.left = canvas.backgroundImage.left* (1 / canvasScale);
         canvas.backgroundImage.top =  canvas.backgroundImage.top* (1 / canvasScale);
+      }
       var objects = canvas.getObjects();
       for (var i in objects) {
         var scaleX = objects[i].scaleX;
@@ -1561,7 +1565,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     };
     ///// END: ZOOM CANVAS
     /// SAVE IMAGE
-    $scope.saveImg = function() {
+    $scope.saveImg = function(value) {
       $ionicLoading.show();
       if (!fabric.Canvas.supports('toDataURL')) {
         alert('This browser doesn\'t provide means to serialize canvas to an image');
@@ -1570,7 +1574,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           canvas.overlayImage = false;
           $scope.data.ruler = false;
           canvas.renderAll();
-          for (var i = 0; i < 3; i++) {
+          for (var i = 0; i < value; i++) {
             $scope.Zoomin();
           
           }
@@ -1799,5 +1803,32 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         });
       }
     };
-  });
+  })
 /////////////UPLOAD IMAGE BG
+.factory('focus', function ($timeout, $window) {
+                return function (id) {
+                    // timeout makes sure that is invoked after any other event has been triggered.
+                    // e.g. click events that need to run before the focus or
+                    // inputs elements that are in a disabled state but are enabled when those events
+                    // are triggered.
+                    $timeout(function () {
+                        var element = $window.document.getElementById(id);
+                        if (element)
+                            element.focus();
+                    });
+                };
+            })
+
+.directive('eventFocus', function (focus) {
+                        return function (scope, elem, attr) {
+                            elem.on(attr.eventFocus, function () {
+                                focus(attr.eventFocusId);
+                            });
+
+                            // Removes bound events in the element itself
+                            // when the scope is destroyed
+                            scope.$on('$destroy', function () {
+                                element.off(attr.eventFocus);
+                            });
+                        };
+                    })

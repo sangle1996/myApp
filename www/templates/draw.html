@@ -12,7 +12,7 @@
   
   </ion-header-bar>
   <ion-content>
-    <canvas id="c" ng-style="canvas" width="360" height="370" style="border:1px solid #ccc"></canvas>
+    <canvas id="c" ng-style="canvas" width="360" height="370" style="border:1px solid #ccc; "></canvas>
 
     <!--   DRAW OR DRAG   -->
     <div class="row editsquare">
@@ -74,7 +74,7 @@
       </div>
       <!-- COl -->
       <div class="col">
-        <button class="button button-icon icon" ng-click="Addtext()"><img class="imgshape" src="../img/text.png"></center></button>
+        <button event-focus="click" event-focus-id="Javascript_example" class="button button-icon icon" ng-click="Addtext()"><img class="imgshape" src="../img/text.png"></center></button>
             <!---  -->
        
             <div style="position:relative; display:inline-block">
@@ -118,7 +118,7 @@
       <!--<a class="button button-outline button-balanced" ng-click="loadJson()">load</br>json</a>-->
       <button class="button button-icon icon ion-upload col" file-browser>
         <div class="note" style="top:22px;left: 7px">Load Project</div></button>
-          <button class="button button-icon icon col" ng-click="saveImg()" >
+          <button class="button button-icon icon col" ng-click="quality=!quality" >
            <center> <div class="note" style="top:23px;left: 19.5px">Image</div>
           <img class="imgshape" style="max-height: 26px;max-width: 26px" src="../img/download.png"></center>
         </button>
@@ -137,12 +137,12 @@
       </ion-list>
     </div>
 <!---- -->    
-    <a class="itext itext-show-hide" ng-show="showitext">
+    <a class="itext itext-show-hide" ng-if="showitext" >
       <div class="row">
         <button class="button button-small button-assertive" style="margin-right: 3px;" ng-click="dtEditText('bold')">Bold</button>
         <button class="button button-small button-assertive" style="margin-right: 3px;" ng-click="dtEditText('italic')">Italic</button>
         <select ng-options="item as item for item in font " style="margin-right: 3px;" ng-model="item" ng-change="update(item)">
-          <input type="text" ng-click="input()" ng-change="textedit(data.text)"  id="Javascript_example" class="col" ng-model="data.text" autofocus>
+          <input type="text" ng-click="input()" ng-change="textedit(data.text)"  id="Javascript_example" class="col" ng-model="data.text" placeholder="Text" >
       </div>
     </a>
 <!---- -->
@@ -204,6 +204,11 @@
       <button class="button button-positive" style="background-color: rgba(0, 0, 0, 0);color: black" ng-click='backgroundimage=false' image>Img</button>
        <center><button class="button button-icon icon ion-close-round" ng-click="deletebg()"   ></button></center>
     </div>
+    <div ng-show="quality" class="quality images-show-hide">
+      <button class="button button-positive" style="background-color: rgba(0, 0, 0, 0.7);color: white" ng-click='saveImg(4);quality=false' >300</button>
+      <button class="button button-positive" style="background-color: rgba(0, 0, 0, 0.7);color: white" ng-click='saveImg(3);quality=false' >200</button>
+       <button class="button button-positive" style="background-color: rgba(0, 0, 0, 0.7);color: white" ng-click='saveImg(2);quality=false' >100</button>
+    </div>
        <div class="range brushlevel">
       <input ng-style="stylecolor" type="range"  ng-change="setlevel(data.value)" ng-model="data.value" min="{{min}}" max="{{max}}">
     </div>  
@@ -217,6 +222,8 @@
       <input type="range" ng-model="data.zoom" class="ranges" ng-style="stylecolorzoom" ng-change="setzoom(data.zoom);setzoomobject(data.zoom)" min="{{zoomless}}" max="{{zoommax}}">
         <button class="button button-small" ng-model="data.autosnap" ng-click="autosnap(data.autosnap);"><img  class="checkmark" ng-if="data.autosnap" src="../img/checkmark.png"></img>Auto Snap</button>
     </div>  
+
+
 
 
   </ion-content>
