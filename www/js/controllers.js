@@ -380,7 +380,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       canvas.on('mouse:down', function(e) {
         $scope.showitext = false;
         $scope.$evalAsync();
-        if (e.target) {
+        if (e.target && e.target.get('type') === "group") {
           if (e.target.get('type') === "text") {
             $scope.showitext = true;
             $scope.data.text = e.target.get('text')=='Text'?'':e.target.get('text');
@@ -499,13 +499,15 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     /////// BEGIN: SET BACKGROUND
 
     var copbg = $rootScope.$on("uploadbg", function(event, opt) {
+      $scope.full(true);
+
       fabric.Image.fromURL(opt.a, function(img) {
         // add background image
-       
+     
         var center = canvas.getCenter(); ///get center value
-        if (img.width < img.height) { //////// check size to fit image
+         if (img.width < img.height) { //////// check size to fit image
           img1 = img.set({
-            scaleX: canvas.width / (img.width + (img.height - (canvas.height + (img.width - canvas.width)))),
+            scaleX: canvas.width / (img.width +  Math.abs(img.height - (canvas.height + Math.abs(canvas.width-img.width ))))+0.12 ,
             scaleY: canvas.height / img.height,
             top: center.top,
             left: center.left,
@@ -515,9 +517,10 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           
         }
         if (img.width >= img.height) {
+          console.log("???");
           img1 = img.set({
             scaleX: canvas.width / img.width,
-            scaleY: canvas.height / (img.height + (img.width - (canvas.width + (img.height - canvas.height)))),
+            scaleY: canvas.height / (img.height + Math.abs(img.width - (canvas.width + (-img.height + canvas.height)))),
             top: center.top,
             left: center.left,
             originX: 'center',
@@ -914,6 +917,67 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     var drawStraight = function() {
       removeEvents();
       changeObjectSelection(false);
+        var line, isDown;
+    var arr = new Array();
+    var startx = new Array();
+    var endx = new Array();
+    var starty = new Array();
+    var endy = new Array();
+    var temp = 0;
+
+         
+          
+    fabric.Object.prototype.transparentCorners = false;         
+          
+    canvas.on('mouse:down', function(o){      
+   
+         isDown = true;
+         var pointer = canvas.getPointer(o.e);
+
+         var points = [$scope.standard(pointer.x, 'x'), $scope.standard(pointer.y, 'y'), $scope.standard(pointer.x, 'x'), $scope.standard(pointer.y, 'y')];
+         startx[temp] =$scope.standard(pointer.x, 'x');
+         starty[temp] = $scope.standard(pointer.y, 'y');
+         line = new fabric.Line(points, {
+            strokeWidth: Math.abs($scope.data.value),
+          fill: document.getElementById("myColor").value,
+          stroke: document.getElementById("myColor").value,
+          originX: 'left',
+          originY: 'top',
+          selectable: false,
+          padding: 20,
+          cornerSize: 20,
+          borderColor: '#E8E8E8',
+          cornerColor: '#44444487',
+          transparentCorners: true,
+          cornerStyle: 'circle', //or rect
+          strokeDashArray: $scope.isdashed,
+          opacity: $scope.data.valueo,       
+         });
+         canvas.add(line);
+         
+    });
+
+    canvas.on('mouse:move', function(o){
+           
+            canvas.renderAll();
+      if (!isDown) return;
+      var pointer = canvas.getPointer(o.e);
+      line.set({ x2: $scope.standard(pointer.x, 'x'), y2: $scope.standard(pointer.y, 'y') });
+      
+      endx[temp] =$scope.standard(pointer.x, 'x');
+      endy[temp] = $scope.standard(pointer.y, 'y');   
+            
+      canvas.renderAll();
+    }); 
+    canvas.on('mouse:up', function(o){
+       var pointer = canvas.getPointer(o.e);      
+       isDown = false;      
+        
+    });
+    
+
+
+      /*
       canvas.on('mouse:down', function(o) {
         isDown = true;
         var pointer = canvas.getPointer(o.e);
@@ -946,7 +1010,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         canvas.renderAll();
         line.setCoords();
       });
-      canvas.on('mouse:up', function(o) {});
+      canvas.on('mouse:up', function(o) {});*/
     }
     /// END: DRAW STRAIGHT
     //// BEGIN: DRAWING TEXT
@@ -972,6 +1036,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       });
       canvas.add(itext).setActiveObject(itext);
       $scope.showitext=true;
+      $scope.data.text="";
 
       /*canvas.on('text:editing:entered', function(e) {
 
@@ -1056,10 +1121,13 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     /////END: OPTION ITEXT
     ////// BEGIN: ADD THE RULER
     canvas.renderAll(); //reset
-    $scope.data.zoom = 30; // default zoom
+    $scope.data.zoom = 15; // default zoom
     $scope.zoomless = 15; // min zoom
     $scope.zoommax = 60; // max zoom
+    $scope.data.ruler=true;  
+
     $scope.setzoom = function(intzoom) {$scope.ruler(intzoom)}
+
     $scope.ruler = function(intzoom) {
       
         /////// ALL CHANGE ZOOM WITH FUNCTION:"setzoom" 
@@ -1073,7 +1141,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           var ys = [];
           $scope.standardx = [];
           $scope.standardy = [];
-          for (var i = parseInt(intzoom); i <= 500; i += parseInt(intzoom)) {
+          for (var i = parseInt(intzoom); i <= 900; i += parseInt(intzoom)) {
             ///////////// stripe  AND RULER X
            
          
@@ -1102,7 +1170,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
               height: 1000,
               left: i,
               top: 0,
-              fill: 'rgba(0, 0, 0, 0.25)',
+              fill: 'rgba(0, 0, 0, 0.29)',
             });
             $scope.standardx.push(x.left)
             xobj = x;
@@ -1112,7 +1180,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
               height: 0.5,
               left: 0,
               top: i,
-              fill: 'rgba(0, 0, 0, 0.25)',
+              fill: 'rgba(0, 0, 0, 0.29)',
             });
             $scope.standardy.push(y.top)
             yobj = y;
@@ -1140,22 +1208,113 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       cop();
     });
     ///END: UPLOAD object 
+      $scope.state=true;
+      $scope.full=function(state){
+
+        $scope.state=state==true?false:true;
+        canvas.setHeight(state==true?620:370);
+        $scope.ionheader=state==true? {'display': 'none'}:'';
+        $scope.ioncontent=state==true?{'top':'0px'}:'';
+        canvas.renderAll();
+      }
+
+
+
+
+
+
+    $scope.ruler( $scope.data.zoom);
     //////BEGIN: DRAWING arrow
     var drawArrow = function() {
       removeEvents();
       changeObjectSelection(false);
+        group = new fabric.Group();
+          canvas.add(group);
+       
+        var line, isDown;
+    var arr = new Array();
+    var startx = new Array();
+    var endx = new Array();
+    var starty = new Array();
+    var endy = new Array();
+    var temp = 0;
+         var x2="",y2="";
+         
+          
+     
+     
+    canvas.on('mouse:down', function(o){      
+
+         isDown = true;
+         var pointer = canvas.getPointer(o.e);
+          x2=x2==""?$scope.standard(pointer.x, 'x'):x2;
+          y2=y2==""?$scope.standard(pointer.y, 'y'):y2;
+         var points = [x2, y2,$scope.standard(pointer.x, 'x'), $scope.standard(pointer.y, 'y')];
+         startx[temp] = $scope.standard(pointer.x, 'x');
+         starty[temp] = $scope.standard(pointer.y, 'y');
+         line = new fabric.Line(points, {
+          strokeWidth: Math.abs($scope.data.value),
+          fill: document.getElementById("myColor").value,
+          stroke: document.getElementById("myColor").value,
+          originX: 'left',
+          originY: 'top',
+          selectable: false,
+          padding: 20,
+          cornerSize: 20,
+          borderColor: '#E8E8E8',
+          cornerColor: '#44444487',
+          transparentCorners: true,
+          cornerStyle: 'circle', //or rect
+          strokeDashArray:[3,3],
+          opacity: 0.4     
+         });
+         canvas.add(line);
+         
+    });
+
+    canvas.on('mouse:move', function(o){
+           
+            canvas.renderAll();
+      if (!isDown) return;
+      var pointer = canvas.getPointer(o.e);
+      line.set({ x2: $scope.standard(pointer.x, 'x'), y2: $scope.standard(pointer.y, 'y') });
+     
+      endx[temp] = $scope.standard(pointer.x, 'x');
+      endy[temp] = $scope.standard(pointer.y, 'y');   
+            
+      canvas.renderAll();
+    }); 
+    canvas.on('mouse:up', function(o){
+       var pointer = canvas.getPointer(o.e);   
+      x2=line.get('x2');
+      y2=line.get('y2');   
+       line.set('strokeDashArray',$scope.isdashed);
+         line.set('opacity', $scope.data.valueo),     
+       canvas.remove(line);
+        group.addWithUpdate(line);
+        group.set('selectable',false);
+       isDown = false;      
+        
+    });
+    
+
+      /*
       var point1;
       var line = null;
       var lines = [];
+      var aline={};
+      var groupline=[]
+      var x2,y2;    
+      group = new fabric.Group();
+          canvas.add(group);
       canvas.on('mouse:down', function(o) {
-        var pointer = canvas.getPointer(o.e);
-        point1 = new fabric.Point(pointer.x, pointer.y);
+        var pointer =  canvas.getPointer(o.e);
+      
         if (line) {
-          console.log(line);
+              
           line = new fabric.Line([line.get('x2'), line.get('y2'), $scope.standard(pointer.x, 'x'), $scope.standard(pointer.y, 'y')], {
             stroke: document.getElementById("myColor").value,
-            lockMovementX: true,
-            lockMovementY: true,
+
             strokeWidth: Math.abs($scope.data.value),
             selectable: false,
             hoverCursor: 'default',
@@ -1167,8 +1326,11 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
             strokeDashArray: $scope.isdashed,
             opacity: $scope.data.valueo,
           });
-          canvas.add(line);
+        
+           canvas.add(line);
+            canvas.renderAll();
         } else {
+           
           line = new fabric.Line([$scope.standard(pointer.x, 'x'), $scope.standard(pointer.y, 'y'), $scope.standard(pointer.x, 'x'), $scope.standard(pointer.y, 'y')], {
             stroke: document.getElementById("myColor").value,
             lockMovementX: true,
@@ -1181,10 +1343,16 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
             cornerColor: '#44444487',
             transparentCorners: true,
             cornerStyle: 'circle', //or rect
-            strokeDashArray: $scope.isdashed,
+            strokeDashArray: [5,5],
             opacity: $scope.data.valueo,
+
           });
+
           canvas.add(line);
+          canvas.renderAll();
+        
+           
+
         }
       });
       canvas.on('mouse:move', function(o) {
@@ -1193,13 +1361,19 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           x2: $scope.standard(pointer.x, 'x'),
           y2: $scope.standard(pointer.y, 'y')
         });
+       
         canvas.renderAll();
-        // console.log(canvas.getObjects().length);
-        //console.log(canvas.getObjects().pop());
       });
       canvas.on('mouse:up', function(o) {
+        canvas.remove(line);
+        group.addWithUpdate(line);
+        group.set('selectable',false);
         canvas.renderAll();
+      
+      
+
       });
+      */
     };
     /////END: DRAWING arrow
     /////BEGIN FILL
@@ -1571,12 +1745,13 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         alert('This browser doesn\'t provide means to serialize canvas to an image');
       } else {
         $timeout(function() {
-          canvas.overlayImage = false;
-          $scope.data.ruler = false;
+         
+        
           canvas.renderAll();
+          $scope.full(true);
           for (var i = 0; i < value; i++) {
             $scope.Zoomin();
-          
+            
           }
           console.log(canvas.toDataURL('image/jpeg'));
           document.addEventListener('deviceready', function() {
@@ -1603,7 +1778,6 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     /// SAVE IMAGE
     ////SAVE JSON AS TEXT
     $scope.saveJson = function() {
-      canvas.overlayImage = false;
       saveText(JSON.stringify(canvas.toJSON()), "test.txt");
     }
 
@@ -1624,8 +1798,9 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     ////SAVE JSON AS TEXT
     ///LOAD JSON
     $scope.loadJson = function(obj) {
-      $scope.data.ruler = 0;
+        
       canvas.loadFromDatalessJSON(obj, function() {
+
         for(let i in canvas.getObjects()){
           canvas.getObjects()[i].set('cornerSize', 20);
            canvas.getObjects()[i].set('borderColor', '#E8E8E8');
@@ -1634,6 +1809,8 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
               canvas.getObjects()[i].set('cornerStyle', 'circle');
                canvas.getObjects()[i].set('cornerSize', 20);
                canvas.getObjects()[i].set('padding', 20); 
+                console.log( canvas.getObjects()[i] )
+
         
 
         }
@@ -1653,6 +1830,8 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     $scope.delete = function() {
       canvas.clear();
       $scope.data.ruler = false;
+      $scope.data.showshape=false;
+      $scope.data.showstraight=false;
       canvas.backgroundColor = "white"
       canvas.renderAll();
     }
@@ -1823,6 +2002,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
                         return function (scope, elem, attr) {
                             elem.on(attr.eventFocus, function () {
                                 focus(attr.eventFocusId);
+
                             });
 
                             // Removes bound events in the element itself
