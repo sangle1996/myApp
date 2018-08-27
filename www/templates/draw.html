@@ -1,5 +1,6 @@
-<ion-modal-view style="background-color:rgba(40, 30, 30, 0.08)">
-  <ion-header-bar class="headerbar" style="background-color: #111;">
+<ion-modal-view style="background-color:rgba(40, 30, 30, 0.08)" >
+
+  <ion-header-bar class="headerbar" style="background-color: #111;" ng-style="ionheader">
     <button ng-click="Undo()" class="button button-positive button-icon icon ion-reply "></button>
       <button ng-click="Redo()"  class="button button-positive button-icon icon ion-forward "></button>
      <button ng-click="Pass()" style="text-align:left; color: green" class="button button-positive button-icon icon ion-document "></button>
@@ -8,13 +9,18 @@
       <input style="margin-left:-5px" ng-style="stylecolor" type="range"  ng-change="setlevel(data.value)" ng-model="data.value" min="{{min}}" max="{{max}}">
        <div class="sizebrush" ng-style="sizebrush"></div><div class="maxsizebrush"></div>
     </div>  
+   
     <!--<center> <font class="title" style="color: white">DRAW</font></center>-->
   
   </ion-header-bar>
-  <ion-content>
-    <canvas id="c" ng-style="canvas" width="360" height="370" style="border:1px solid #ccc; "></canvas>
+  <ion-content ng-style="ioncontent">
 
+    <canvas id="c" ng-style="canvas" width="360" height="370" style="border:1px solid #ccc; "></canvas>
+    <div class="button button-small button-light rangeruler-in" ng-click="full(state);" style="position: absolute; top:520px;left:170px; border-radius: 100%;border-color: rgba(0, 0, 0, 0.07);color: transparent;border-width: 2px"  ng-show="!state" > </div>
+     <button ng-click="Undo()" ng-show="!state" style="color: black;position: absolute;left: 0;top:570px" class="button button-positive button-icon icon ion-reply "></button>
+      <button ng-click="Redo()" ng-show="!state" style="color: black;position: absolute;left: 50px;top:570px"  class="button button-positive button-icon icon ion-forward "></button>
     <!--   DRAW OR DRAG   -->
+   <div ng-show="state"> 
     <div class="row editsquare">
       <!-- COl -->
       <div class="col">
@@ -41,7 +47,7 @@
       </div>
       <!-- COl -->
       <div class="col">
-        <button class="button button-icon icon" ng-click="showshape=!showshape;showstraight=false;mode(1,0)">
+        <button class="button button-icon icon" ng-click="data.showshape=!data.showshape;data.showstraight=false;mode(1,0)">
           <img class="imgshape" src="../img/shape.png">
         </button>
 
@@ -58,7 +64,7 @@
       </div>
       <!-- COl -->
       <div class="col">
-        <button class="button button-icon icon" ng-click="showstraight=!showstraight;showshape=false;mode(1,0)">
+        <button class="button button-icon icon" ng-click="data.showstraight=!data.showstraight;data.showshape=false;mode(1,0)">
           <img class="imgshape" src="../img/straight.png">
         </button>
          <div style="position:relative; display:inline-block">
@@ -91,6 +97,8 @@
       </div>
       <div class="col">
         <button class="button button-icon  icon ion-image col" ng-click="backgroundimage=!backgroundimage">
+        </button>
+         <div class="button button-light" ng-click="full(state);">FULL</div>
            <button ng-click="Pass()" style="text-align:center;" class="pass button button-positive button-icon icon ion-document "></button>
 
       </div>
@@ -127,7 +135,7 @@
     </div>
     
   
-    <div class="option " ng-click="objects()"><i class="icon ion-filing" style="font-size: 25px"></i>
+    <div class="option " ng-click="objects();data.draw=false;mode(0,'')"><i class="icon ion-filing" style="font-size: 25px"></i>
       <ion-list class="object funky-show-hide" ng-show="show">
         <div class="row">
           <ion-item class="col col-50" ng-repeat="value in paraobjects track by $index" ng-click="selectobject({{$index}},value.type)">
@@ -137,7 +145,7 @@
       </ion-list>
     </div>
 <!---- -->    
-    <a class="itext itext-show-hide" ng-if="showitext" >
+    <a class="itext itext-show-hide" ng-show="showitext" >
       <div class="row">
         <button class="button button-small button-assertive" style="margin-right: 3px;" ng-click="dtEditText('bold')">Bold</button>
         <button class="button button-small button-assertive" style="margin-right: 3px;" ng-click="dtEditText('italic')">Italic</button>
@@ -146,7 +154,7 @@
       </div>
     </a>
 <!---- -->
-    <div class="shape shape-show-hide" ng-show="showshape">
+    <div class="shape shape-show-hide" ng-show="data.showshape">
       <div class="row">
         <button class="button button-light button-outline " ng-repeat="shape in listshape" ng-click="mode(1,shape);">
           <center><img class="imgshape" src="../img/{{shape}}.png"><div class="inline" ng-if="shape==shapes"></div></center>
@@ -166,7 +174,7 @@
 
 
 <!---- -->
-    <div class="shape shape-show-hide" ng-show="showstraight">
+    <div class="shape shape-show-hide" ng-show="data.showstraight">
       <div class="row">
 
       <button class="button button-light button-outline" ng-repeat="straight in liststraight" ng-click="mode(1,straight)">
@@ -224,7 +232,7 @@
     </div>  
 
 
-
+</div>
 
   </ion-content>
 </ion-modal-view>

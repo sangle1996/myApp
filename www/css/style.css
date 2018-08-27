@@ -221,19 +221,10 @@ div.maxopanlevel{
     }
      
 }
-/*
-.b{
-    position: absolute;
-     top: 10px;
-     height: 10px;
-     width: 10px;
-     background-color: red;
-    transition: height .4s ease-in-out;
-    -webkit-transition: height .4s ease-in-out;
-    -moz-transition: height .4s ease-in-out;
-    } 
-.opacitylevel:active+ .b {background-color: blue;height: 100px} 
-*/
+
+
+
+
 .quality{
   display: block;
     position: absolute;
