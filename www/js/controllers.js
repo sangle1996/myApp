@@ -284,10 +284,67 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         reload: true
       });
     }
-  }).controller('DrawCtrl', function($cordovaFile, $ionicLoading, $rootScope, $scope, $http, $ionicPlatform, $ionicModal, $timeout, $state, $cordovaDevice) {
+  }).controller('DrawCtrl', function($cordovaFile, $ionicPopup, $ionicLoading, $rootScope, $scope, $http, $ionicPlatform, $ionicModal, $timeout, $state, $cordovaDevice) {
+      
+        $scope.data = {}
+      $scope.sizes=[{'img':'haft','name':'1/2 page','size':'310x370'},
+      {'img':'full','name':'Full page','size':'620x370'},
+      {'img':'square','name':'Square','size':'370x370'}
+      ];
+      $scope.width=360;
+      $scope.height=370;
+      /* begin: choose size of vanvas */
+    
+         
+
+
+  var init = function() {
+  
+      return $ionicModal.fromTemplateUrl('modal.html', {
+          scope: $scope,
+          animation: 'slide-in-up'
+        })
+      .then(function(modal) {
+        $scope.modal = modal;
+      })
+    
+  };
+
+  
+  $scope.showPopup = function() {
+    init().then(function() {
+      $scope.modal.show();
+        });
+  };
+  $scope.showPopup();
+   $scope.data.height;
+   $scope.sizepage = function(ok) {
+            $scope.delete();
+            $scope.modal.remove();
+            console.log(ok);
+            canvas.setHeight(ok=='haft'?310:ok=='square'?370:370);
+            $scope.data.height=ok=='haft'?310:ok=='square'?370:620;
+            
+            $scope.isfull=ok=='full'?true:false;
+       
+            canvas.renderAll();
+               } 
+ /*end: choose size of vanvas*/
+ $scope.state=true;
+      $scope.full=function(state){
+
+        $scope.state=state==true?false:true;
+        canvas.setHeight(state==true?620:370);
+        $scope.ionheader=state==true? {'display': 'none'}:'';
+        $scope.ioncontent=state==true?{'top':'0px'}:'';
+        canvas.renderAll();
+      }
+         
     var canvas = new fabric.Canvas('c', {
       selection: false,
       backgroundColor: "white",
+      height: $scope.height,
+      with: $scope.width
     }); ////  CREATE NEW CANVAS.
     $scope.reset = false;
     $scope.data = {};
@@ -378,10 +435,12 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     ////////// MOUSE DOWN
     var mousedown = function() {
       canvas.on('mouse:down', function(e) {
+       
         $scope.showitext = false;
         $scope.$evalAsync();
-        if (e.target && e.target.get('type') === "group") {
+        if (e.target && e.target.get('type') !== "group") {
           if (e.target.get('type') === "text") {
+
             $scope.showitext = true;
             $scope.data.text = e.target.get('text')=='Text'?'':e.target.get('text');
             $scope.$evalAsync();
@@ -420,7 +479,32 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           changeObjectSelection(true);
         }
       });
+
+}
+
+
+    /*   canvas.on({
+ 'touch:gesture': function(event) {
+  // Handle zoom only if 2 fingers are touching the screen
+  if (event.e.touches && event.e.touches.length == 2) {
+    // Get event point
+    var point = new fabric.Point(event.self.x, event.self.y);
+    // Remember canvas scale at gesture start
+    if (event.self.state == "start") {
+      zoomStartScale = self.canvas.getZoom();
     }
+    // Calculate delta from start scale
+    var delta = zoomStartScale * event.self.scale;
+    // Zoom to pinch point
+    self.canvas.zoomToPoint(point, delta);
+  }
+
+  }})*/
+        
+
+    
+    
+   
     //////////MOUSE MOVE
     /*    var blue = new fabric.Rect({
        id:1,top: 60, left: 240, width: 10, height: 10, fill: 'blue',opacity :false,selectable:false });
@@ -446,6 +530,48 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
        });
      }*/
     //////////MOUSE MOVE
+  canvas.on({
+        'touch:gesture': function(e) {
+          console.log(e);
+            if (e.e.touches && e.e.touches.length == 2) {
+                pausePanning = true;
+                var point = new fabric.Point(e.self.x, e.self.y);
+                if (e.self.state == "start") {
+                    zoomStartScale = canvas.getZoom();
+                }
+                var delta = zoomStartScale * e.self.scale;
+                console.log(delta);
+           
+               $scope.Zoominfinger(delta);
+                pausePanning = false;
+                
+                
+            }
+        },
+        'object:selected': function() {
+            pausePanning = true;
+        },
+        'selection:cleared': function() {
+            pausePanning = false;
+        },
+        'touch:drag': function(e) {
+            if (pausePanning == false && undefined != e.e.layerX && undefined != e.e.layerY) {
+                currentX = e.e.layerX;
+                currentY = e.e.layerY;
+                xChange = currentX - lastX;
+                yChange = currentY - lastY;
+
+                if( (Math.abs(currentX - lastX) <= 50) && (Math.abs(currentY - lastY) <= 50)) {
+                    var delta = new fabric.Point(xChange, yChange);
+                    canvas.relativePan(delta);
+                }
+
+                lastX = e.e.layerX;
+                lastY = e.e.layerY;
+            }
+        }
+    });
+
     ////LIST SHAPE
     $scope.listshape = ["square", "circle", "multi"];
     $scope.liststraight = ["arrow", "arrows", "straight"];
@@ -499,39 +625,74 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     /////// BEGIN: SET BACKGROUND
 
     var copbg = $rootScope.$on("uploadbg", function(event, opt) {
-      $scope.full(true);
-
-      fabric.Image.fromURL(opt.a, function(img) {
+      
+       if($scope.data.height==620)
+            {$scope.full(true)
+               fabric.Image.fromURL(opt.a, function(img) {
         // add background image
      
         var center = canvas.getCenter(); ///get center value
-         if (img.width < img.height) { //////// check size to fit image
+        var scaleWidth = canvas.getWidth() / img.width;
+                var scaleHeight = canvas.getHeight() / img.height;
+                var scale = Math.min(scaleWidth, scaleHeight);
+                   
           img1 = img.set({
-            scaleX: canvas.width / (img.width +  Math.abs(img.height - (canvas.height + Math.abs(canvas.width-img.width ))))+0.12 ,
-            scaleY: canvas.height / img.height,
+            scaleX: scale,
+            scaleY: scale,
             top: center.top,
             left: center.left,
             originX: 'center',
             originY: 'center',
           });
-          
-        }
-        if (img.width >= img.height) {
-          console.log("???");
-          img1 = img.set({
-            scaleX: canvas.width / img.width,
-            scaleY: canvas.height / (img.height + Math.abs(img.width - (canvas.width + (-img.height + canvas.height)))),
-            top: center.top,
-            left: center.left,
-            originX: 'center',
-            originY: 'center',
-          });
-          
-        }
 
        canvas.setBackgroundImage(img1);
        canvas.renderAll();
       });
+            }
+            else if($scope.data.height==370){
+               fabric.Image.fromURL(opt.a, function(img) {
+        // add background image
+     
+        var center = canvas.getCenter(); ///get center value
+        var scaleWidth = canvas.getWidth() / img.width;
+                var scaleHeight = canvas.getHeight() / img.height;
+                var scale = Math.min(scaleWidth, scaleHeight);
+                   
+          img1 = img.set({
+            scaleX: scale,
+            scaleY: scale,
+            top: center.top,
+            left: center.left,
+            originX: 'center',
+            originY: 'center',
+          });
+          
+        
+
+       canvas.setBackgroundImage(img1);
+       canvas.renderAll();
+      });}else if($scope.data.height==310){
+              
+               fabric.Image.fromURL(opt.a, function(img) {
+                var center = canvas.getCenter(); ///get center value
+                var scaleWidth = canvas.getWidth() / img.width;
+                var scaleHeight = canvas.getHeight() / img.height;
+                var scale = Math.min(scaleWidth, scaleHeight);
+                   
+          img1 = img.set({
+            scaleX: scale,
+            scaleY: scale,
+            top: center.top,
+            left: center.left,
+            originX: 'center',
+            originY: 'center',
+          });
+          
+        
+       canvas.setBackgroundImage(img1);
+       canvas.renderAll();
+      });}
+     
 
     });
     $scope.$on('$destroy', function() {
@@ -542,17 +703,19 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     var copimage = $rootScope.$on("images", function(event, opt) {
       $scope.mode(false, "");
       $scope.data.draw = false;
+
       fabric.Image.fromURL(opt.a, function(img) {
         var center = canvas.getCenter(); ///get center value
-        if (img.width < img.height) { //////// check size to fit image
+        if (img.width <= img.height) { //////// check size to fit image
+          console.log("??");
           img1 = img.set({
             id: 'img',
-            scaleX: canvas.width / (img.width + (img.height - (canvas.height + (img.width - canvas.width)))) - 0.1,
-            scaleY: canvas.height / img.height - 0.1,
-           top: center.top/2,
-            left: center.left/2,
-            originX: 'left',
-            originY: 'top',
+            scaleX: canvas.width / (img.width*2),
+            scaleY: canvas.width / (img.width*2),
+            top: center.top,
+            left: center.left,
+            originX: 'center',
+            originY: 'center',
             padding: 20,
             cornerSize: 20,
             borderColor: '#E8E8E8',
@@ -565,12 +728,12 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         if (img.width >= img.height) {
           img1 = img.set({
             id: 'img',
-            scaleX: canvas.width / img.width - 0.1,
-            scaleY: canvas.height / (img.height + (img.width - (canvas.width + (img.height - canvas.height)))) - 0.1,
-            top: center.top/2,
-            left: center.left/2,
-            originX: 'left',
-            originY: 'top',
+            scaleX: canvas.height / (img.height*2),
+            scaleY: canvas.height / (img.height*2),
+            top: center.top,
+            left: center.left,
+            originX: 'center',
+            originY: 'center',
             padding: 20,
             cornerSize: 20,
             borderColor: '#E8E8E8',
@@ -831,6 +994,9 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       });
     }
     ////// END: DRAW AROWSSSSSSSSSSSSSSS
+
+
+
     /////BEGIN: DRAW LINE ARROW
     var drawLinearrow = function() {
       removeEvents();
@@ -1208,15 +1374,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       cop();
     });
     ///END: UPLOAD object 
-      $scope.state=true;
-      $scope.full=function(state){
-
-        $scope.state=state==true?false:true;
-        canvas.setHeight(state==true?620:370);
-        $scope.ionheader=state==true? {'display': 'none'}:'';
-        $scope.ioncontent=state==true?{'top':'0px'}:'';
-        canvas.renderAll();
-      }
+     
 
 
 
@@ -1653,6 +1811,37 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
      canvas.renderAll();
            }
     /////END: DELETE BG
+    $scope.Zoominfinger = function(xx) {
+    SCALE_FACTOR=xx>=1?1.02:(1/1.02);
+      canvas.setHeight(canvas.getHeight() * SCALE_FACTOR);
+      canvas.setWidth(canvas.getWidth() * SCALE_FACTOR);
+      if(canvas.backgroundImage){
+        canvas.backgroundImage.scaleX = canvas.backgroundImage.scaleX * SCALE_FACTOR;
+        canvas.backgroundImage.scaleY =  canvas.backgroundImage.scaleY * SCALE_FACTOR;
+        canvas.backgroundImage.left = canvas.backgroundImage.left* SCALE_FACTOR;
+        canvas.backgroundImage.top =  canvas.backgroundImage.top* SCALE_FACTOR;
+      }
+        
+           
+
+      var objects = canvas.getObjects();
+      for (var i in objects) {
+        var scaleX = objects[i].scaleX;
+        var scaleY = objects[i].scaleY;
+        var left = objects[i].left;
+        var top = objects[i].top;
+        var tempScaleX = scaleX * SCALE_FACTOR;
+        var tempScaleY = scaleY * SCALE_FACTOR;
+        var tempLeft = left * SCALE_FACTOR;
+        var tempTop = top * SCALE_FACTOR;
+        objects[i].scaleX = tempScaleX;
+        objects[i].scaleY = tempScaleY;
+        objects[i].left = tempLeft;
+        objects[i].top = tempTop;
+        objects[i].setCoords();
+      }
+      canvas.renderAll();
+    };
     //// BEGIN: ZOOM CANVAS
     var canvasScale = 1;
     var SCALE_FACTOR = 1.2;
@@ -1746,12 +1935,11 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       } else {
         $timeout(function() {
          
-        
+          if($scope.data.height==620)
+            {$scope.full(true)}
           canvas.renderAll();
-          $scope.full(true);
           for (var i = 0; i < value; i++) {
             $scope.Zoomin();
-            
           }
           console.log(canvas.toDataURL('image/jpeg'));
           document.addEventListener('deviceready', function() {

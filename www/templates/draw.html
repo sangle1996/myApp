@@ -9,13 +9,15 @@
       <input style="margin-left:-5px" ng-style="stylecolor" type="range"  ng-change="setlevel(data.value)" ng-model="data.value" min="{{min}}" max="{{max}}">
        <div class="sizebrush" ng-style="sizebrush"></div><div class="maxsizebrush"></div>
     </div>  
+      <button ng-click="showPopup()"  class="button button-positive button-icon icon ion-plus-round"></button>
    
     <!--<center> <font class="title" style="color: white">DRAW</font></center>-->
   
   </ion-header-bar>
   <ion-content ng-style="ioncontent">
-
-    <canvas id="c" ng-style="canvas" width="360" height="370" style="border:1px solid #ccc; "></canvas>
+ <div class="flex-container" style="height: 370px;width: auto; background-color: rgb(204, 204, 204); ">
+    <canvas id="c"   ng-style="canvas" width="360"  style="border:1px solid #ccc; display:inline-block;"></canvas>
+    </div>
     <div class="button button-small button-light rangeruler-in" ng-click="full(state);" style="position: absolute; top:520px;left:170px; border-radius: 100%;border-color: rgba(0, 0, 0, 0.07);color: transparent;border-width: 2px"  ng-show="!state" > </div>
      <button ng-click="Undo()" ng-show="!state" style="color: black;position: absolute;left: 0;top:570px" class="button button-positive button-icon icon ion-reply "></button>
       <button ng-click="Redo()" ng-show="!state" style="color: black;position: absolute;left: 50px;top:570px"  class="button button-positive button-icon icon ion-forward "></button>
@@ -98,7 +100,7 @@
       <div class="col">
         <button class="button button-icon  icon ion-image col" ng-click="backgroundimage=!backgroundimage">
         </button>
-         <div class="button button-light" ng-click="full(state);">FULL</div>
+         <div ng-if="isfull" class="button button-light" ng-click="full(state);">FULL</div>
            <button ng-click="Pass()" style="text-align:center;" class="pass button button-positive button-icon icon ion-document "></button>
 
       </div>
@@ -233,6 +235,16 @@
 
 
 </div>
+   <script type="text/ng-template" id="modal.html">
+      <div class="modal">
+        <ion-header-bar>
+          <h1 class="title">CHOOSE THE SIZE</h1>            
+        </ion-header-bar>
+        <ion-content>
+       <button ng-click="sizepage(size.img)" class="button  button-block button-positive button-outline " ng-repeat="size in sizes"><center> {{size.name}}, {{size.size}}</center></button> 
+        </ion-content>
+      </div>      
+    </script>
 
   </ion-content>
 </ion-modal-view>
