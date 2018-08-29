@@ -322,6 +322,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
             $scope.delete();
             $scope.modal.remove();
             console.log(ok);
+             canvas.setWidth(370);
             canvas.setHeight(ok=='haft'?310:ok=='square'?370:370);
             $scope.data.height=ok=='haft'?310:ok=='square'?370:620;
             
@@ -344,7 +345,8 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
       selection: false,
       backgroundColor: "white",
       height: $scope.height,
-      with: $scope.width
+      with: $scope.width,
+      allowTouchScrolling: true,
     }); ////  CREATE NEW CANVAS.
     $scope.reset = false;
     $scope.data = {};
@@ -376,7 +378,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     a();
     /* document.getElementById("c").setAttribute('width', screen.width-40+'!important');*/
     // document.getElementById("c").width=screen.width-40;
-    function changeObjectSelection(value) {
+    function changeObjectSelection(value) { 
       canvas.forEachObject(function(obj) {
         obj.selectable = value;
       });
@@ -434,6 +436,8 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
     //////// MIN MAX DRAW BRUSH
     ////////// MOUSE DOWN
     var mousedown = function() {
+      if(!$scope.data.ismove)
+      {
       canvas.on('mouse:down', function(e) {
        
         $scope.showitext = false;
@@ -479,6 +483,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
           changeObjectSelection(true);
         }
       });
+  }
 
 }
 
@@ -529,12 +534,44 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
 
        });
      }*/
+
     //////////MOUSE MOVE
-  canvas.on({
+$scope.move=function(){
+  var ismove=$scope.data.ismove;
+  if(ismove){
+ 
+  $scope.mode(0,0);
+  $scope.data.draw=false;
+  canvas.discardActiveObject();
+   gesture();
+    canvas.set('allowTouchScrolling', true) ;
+    for(let i in canvas.getObjects()){
+      canvas.getObjects()[i].set('selectable',false);
+    }
+    console.log(canvas.getObjects())
+   canvas.renderAll();
+}
+else{
+  canvas.off('touch:gesture');
+   canvas.set('allowTouchScrolling', false) ;
+    for(let i in canvas.getObjects()){
+      canvas.getObjects()[i].set('selectable',false);
+    }
+  
+}
+}
+var gesture=function(){
+  canvas.on({ 
+     
         'touch:gesture': function(e) {
+               
+                
+            changeObjectSelection(false);
+
+          
           console.log(e);
             if (e.e.touches && e.e.touches.length == 2) {
-                pausePanning = true;
+               
                 var point = new fabric.Point(e.self.x, e.self.y);
                 if (e.self.state == "start") {
                     zoomStartScale = canvas.getZoom();
@@ -543,49 +580,37 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
                 console.log(delta);
            
                $scope.Zoominfinger(delta);
-                pausePanning = false;
                 
                 
             }
+          
         },
-        'object:selected': function() {
-            pausePanning = true;
-        },
-        'selection:cleared': function() {
-            pausePanning = false;
-        },
-        'touch:drag': function(e) {
-            if (pausePanning == false && undefined != e.e.layerX && undefined != e.e.layerY) {
-                currentX = e.e.layerX;
-                currentY = e.e.layerY;
-                xChange = currentX - lastX;
-                yChange = currentY - lastY;
-
-                if( (Math.abs(currentX - lastX) <= 50) && (Math.abs(currentY - lastY) <= 50)) {
-                    var delta = new fabric.Point(xChange, yChange);
-                    canvas.relativePan(delta);
-                }
-
-                lastX = e.e.layerX;
-                lastY = e.e.layerY;
-            }
-        }
+      
+          
+       
     });
+}
+
 
     ////LIST SHAPE
+         $scope.data.ismove=false
     $scope.listshape = ["square", "circle", "multi"];
     $scope.liststraight = ["arrow", "arrows", "straight"];
     ////LIST SHAPE
     //  MODE DRAW LINE, DRAW CIRCLE,...
     $scope.mode = function(isdraw, shape) {
+
       if (!isdraw) {
+      
+         canvas.set('allowTouchScrolling', false) 
         removeEvents();
         changeObjectSelection(true);
         mousedown();
         $scope.showshape=false;
         $scope.showstraight=false;
-      } else if (isdraw) {
-        console.log(shape);
+      } else if (isdraw==1) {
+         canvas.set('allowTouchScrolling', false) 
+        
         $scope.data.draw = true
         $scope.showitext = false;
         $scope.shapes = shape;
@@ -878,6 +903,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
         return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+','+$scope.data.valueo+')';
     }
     throw new Error('Bad Hex');
+}
 }
 
      Hexto RBG */
@@ -1812,7 +1838,7 @@ angular.module('starter.controllers', ['ngCordova.plugins.file', 'ngCordova.plug
            }
     /////END: DELETE BG
     $scope.Zoominfinger = function(xx) {
-    SCALE_FACTOR=xx>=1?1.02:(1/1.02);
+    SCALE_FACTOR=xx>=1?1.04:(1/1.04);
       canvas.setHeight(canvas.getHeight() * SCALE_FACTOR);
       canvas.setWidth(canvas.getWidth() * SCALE_FACTOR);
       if(canvas.backgroundImage){

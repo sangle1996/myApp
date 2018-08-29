@@ -1,3 +1,9 @@
+
+
+
+
+
+
 <ion-modal-view style="background-color:rgba(40, 30, 30, 0.08)" >
 
   <ion-header-bar class="headerbar" style="background-color: #111;" ng-style="ionheader">
@@ -15,8 +21,8 @@
   
   </ion-header-bar>
   <ion-content ng-style="ioncontent">
- <div class="flex-container" style="height: 370px;width: auto; background-color: rgb(204, 204, 204); ">
-    <canvas id="c"   ng-style="canvas" width="360"  style="border:1px solid #ccc; display:inline-block;"></canvas>
+ <div class="flex-container" style="height: 62%;width: auto;background-color: rgb(162, 162, 162,0.5) ">
+    <canvas id="c"   ng-style="canvas" width="360"  style="border:1px solid #ccc; display:inline-block;position:absolute"></canvas>
     </div>
     <div class="button button-small button-light rangeruler-in" ng-click="full(state);" style="position: absolute; top:520px;left:170px; border-radius: 100%;border-color: rgba(0, 0, 0, 0.07);color: transparent;border-width: 2px"  ng-show="!state" > </div>
      <button ng-click="Undo()" ng-show="!state" style="color: black;position: absolute;left: 0;top:570px" class="button button-positive button-icon icon ion-reply "></button>
@@ -100,9 +106,17 @@
       <div class="col">
         <button class="button button-icon  icon ion-image col" ng-click="backgroundimage=!backgroundimage">
         </button>
-         <div ng-if="isfull" class="button button-light" ng-click="full(state);">FULL</div>
-           <button ng-click="Pass()" style="text-align:center;" class="pass button button-positive button-icon icon ion-document "></button>
-
+       
+       <!--  <div ng-if="isfull" class="button button-light" ng-click="full(state);">FULL</div>
+           <button ng-click="Pass()" style="text-align:center;" class="pass button button-positive button-icon icon ion-document "></button>-->
+             <div class="row">
+          <label class="toggle">
+           <div class="note" style="top: 33px;left: 21px">Zoom</div>
+            <input type="checkbox" ng-model="data.ismove" ng-click="move()">
+            <div class="track">
+              <div class="handle"></div>
+            </div>
+          </label></div>
       </div>
 
     </div>
