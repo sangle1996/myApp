@@ -231,9 +231,10 @@ div.maxopanlevel{
   
   justify-content: center;
   align-items: center;
+    overflow:scroll;
 
 }
-
+ 
 .quality{
   display: block;
     position: absolute;
