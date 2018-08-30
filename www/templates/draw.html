@@ -1,9 +1,3 @@
-
-
-
-
-
-
 <ion-modal-view style="background-color:rgba(40, 30, 30, 0.08)" >
 
   <ion-header-bar class="headerbar" style="background-color: #111;" ng-style="ionheader">
@@ -197,12 +191,6 @@
        <center><img class="imgshape" src="../img/{{straight}}.png"><div class="inline" ng-if="straight==shapes"></center>
          <button ng-click="Dashed()" class="button button-light button-outline"><img class="imgshape" src="../img/dashed.png" style="border-radius: 50%;"><img ng-if="isdashed!= false" class="checkmark" src="../img/checkmark.png"></img></button>
       </button>
-                   
-
-
-
-         
-
       </div>
     </div>
 
@@ -243,7 +231,7 @@
     </div>
 
     <div  class="range hoverWrapper  rangeruler-in" ng-show="data.rangeruler">
-      <input type="range" ng-model="data.zoom" class="ranges" ng-style="stylecolorzoom" ng-change="setzoom(data.zoom);setzoomobject(data.zoom)" min="{{zoomless}}" max="{{zoommax}}">
+      <input type="range" ng-model="data.zoom" class="ranges" ng-style="stylecolorzoom" ng-change="setzoom(data.zoom);setzoomobject(data.zoom)" min="{{zoomless}}" max="{{zoommax}}"></input>
         <button class="button button-small" ng-model="data.autosnap" ng-click="autosnap(data.autosnap);"><img  class="checkmark" ng-if="data.autosnap" src="../img/checkmark.png"></img>Auto Snap</button>
     </div>  
 
